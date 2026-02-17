@@ -1,0 +1,11 @@
+{
+    "fmt": {
+        "indentWidth": 4,
+        "proseWrap": "preserve",
+        "lineWidth": 90,
+        "semiColons": true,
+        "singleQuote": true,
+        "bracePosition": "sameLine",
+        "jsx.bracketPosition": "sameLine"
+    }
+}
