@@ -80,9 +80,9 @@ app.whenReady().then(() => {
             responseHeaders: {
                 ...details.responseHeaders,
                 'Content-Security-Policy': [
-                    `default-src 'self'; script-src 'self'  ${
-                        process.env.DEV ? "'unsafe-inline'" : ''
-                    }`,
+                    `default-src 'self'; connect-src ${
+                        process.env.DEV ? 'http: ws:' : 'https: wss:'
+                    };script-src 'self'  ${process.env.DEV ? "'unsafe-inline'" : ''}`,
                 ],
             },
         });

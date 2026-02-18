@@ -1,0 +1,314 @@
+{
+    "admin": {
+        "endpointPrivate": null,
+        "endpointPublic": null
+    },
+    "gateway": {
+        "endpointPrivate": null,
+        "endpointPublic": "ws://localhost:3002"
+    },
+    "cdn": {
+        "endpointPrivate": "http://localhost:3003",
+        "endpointPublic": "http://localhost:3003",
+        "resizeHeightMax": 1000,
+        "resizeWidthMax": 1000,
+        "imagorServerUrl": null,
+        "proxyCacheHeaderSeconds": 86400,
+        "maxAttachmentSize": 26214400
+    },
+    "api": {
+        "endpointPrivate": null,
+        "endpointPublic": "http://localhost:3001/api/v9",
+        "defaultVersion": "9",
+        "activeVersions": [
+            "6",
+            "7",
+            "8",
+            "9"
+        ]
+    },
+    "general": {
+        "instanceName": "Spacebar Instance",
+        "serverName": "http://localhost:3001",
+        "instanceDescription": "This is a Spacebar instance made in the pre-release days",
+        "frontPage": null,
+        "tosPage": null,
+        "correspondenceEmail": null,
+        "correspondenceUserID": null,
+        "image": null,
+        "instanceId": "1473319718600323108",
+        "autoCreateBotUsers": false
+    },
+    "limits": {
+        "user": {
+            "maxGuilds": 1048576,
+            "maxUsername": 32,
+            "maxFriends": 5000,
+            "maxBio": 190
+        },
+        "guild": {
+            "maxRoles": 1000,
+            "maxEmojis": 2000,
+            "maxStickers": 500,
+            "maxMembers": 25000000,
+            "maxChannels": 65535,
+            "maxBulkBanUsers": 200,
+            "maxChannelsInCategory": 65535
+        },
+        "message": {
+            "maxCharacters": 1048576,
+            "maxTTSCharacters": 160,
+            "maxReactions": 2048,
+            "maxAttachmentSize": 1073741824,
+            "maxBulkDelete": 1000,
+            "maxEmbedDownloadSize": 5242880,
+            "maxPreloadCount": 100
+        },
+        "channel": {
+            "maxPins": 500,
+            "maxTopic": 1024,
+            "maxWebhooks": 100,
+            "maxName": 32
+        },
+        "rate": {
+            "enabled": false,
+            "ip": {
+                "count": 500,
+                "window": 5
+            },
+            "global": {
+                "count": 250,
+                "window": 5
+            },
+            "error": {
+                "count": 10,
+                "window": 5
+            },
+            "routes": {
+                "guild": {
+                    "count": 5,
+                    "window": 5
+                },
+                "webhook": {
+                    "count": 10,
+                    "window": 5
+                },
+                "channel": {
+                    "count": 10,
+                    "window": 5
+                },
+                "auth": {
+                    "login": {
+                        "count": 5,
+                        "window": 60
+                    },
+                    "register": {
+                        "count": 2,
+                        "window": 43200
+                    }
+                }
+            }
+        },
+        "absoluteRate": {
+            "register": {
+                "limit": 25,
+                "window": 3600000,
+                "enabled": true
+            },
+            "sendMessage": {
+                "limit": 200,
+                "window": 60000,
+                "enabled": true
+            }
+        }
+    },
+    "security": {
+        "captcha": {
+            "enabled": false,
+            "service": null,
+            "sitekey": null,
+            "secret": null
+        },
+        "twoFactor": {
+            "generateBackupCodes": true
+        },
+        "autoUpdate": true,
+        "requestSignature": "dvRp/8AX80JCwo2Kyoz0rs9ZIwS0omYGWPt4fgeb+5A=",
+        "jwtSecret": null,
+        "forwardedFor": null,
+        "trustedProxies": null,
+        "abuseIpDbApiKey": null,
+        "abuseipdbBlacklistRatelimit": 5,
+        "abuseipdbConfidenceScoreTreshold": 50,
+        "ipdataApiKey": null,
+        "mfaBackupCodeCount": 10,
+        "statsWorldReadable": true,
+        "defaultRegistrationTokenExpiration": 604800000,
+        "cdnSignUrls": false,
+        "cdnSignatureKey": "xBvAdG/+q726Nf8hhxJlHXZs8GhfhDkEIfqYHmm2RH4=",
+        "cdnSignatureDuration": "24h",
+        "cdnSignatureIncludeIp": true,
+        "cdnSignatureIncludeUserAgent": true
+    },
+    "login": {
+        "requireCaptcha": false,
+        "requireVerification": false
+    },
+    "register": {
+        "email": {
+            "required": false,
+            "allowlist": false,
+            "blocklist": true,
+            "domains": []
+        },
+        "dateOfBirth": {
+            "required": true,
+            "minimum": 13
+        },
+        "password": {
+            "required": false,
+            "minLength": 8,
+            "minNumbers": 2,
+            "minUpperCase": 2,
+            "minSymbols": 0
+        },
+        "disabled": false,
+        "requireCaptcha": true,
+        "requireInvite": false,
+        "guestsRequireInvite": true,
+        "allowNewRegistration": true,
+        "allowMultipleAccounts": true,
+        "blockIpDataCoThreatTypes": [
+            "tor",
+            "icloud_relay",
+            "proxy",
+            "datacenter",
+            "anonymous",
+            "known_attacker",
+            "known_abuser",
+            "threat"
+        ],
+        "blockAsnTypes": [
+            ""
+        ],
+        "blockAsns": [
+            ""
+        ],
+        "blockAbuseIpDbAboveScore": 75,
+        "incrementingDiscriminators": false,
+        "defaultRights": "875069521787904",
+        "enableAbuseIpDb": false,
+        "enableIpData": false
+    },
+    "regions": {
+        "default": "spacebar",
+        "useDefaultAsOptimal": true,
+        "available": [
+            {
+                "id": "spacebar",
+                "name": "spacebar",
+                "endpoint": "127.0.0.1:3004",
+                "vip": false,
+                "custom": false,
+                "deprecated": false
+            }
+        ]
+    },
+    "guild": {
+        "discovery": {
+            "showAllGuilds": false,
+            "useRecommendation": false,
+            "offset": 0,
+            "limit": 24,
+            "hideJoinedGuilds": true
+        },
+        "autoJoin": {
+            "enabled": true,
+            "guilds": [],
+            "canLeave": true,
+            "bots": false
+        },
+        "defaultFeatures": [],
+        "publicThreadsInvitable": false
+    },
+    "gif": {
+        "enabled": true,
+        "provider": "tenor",
+        "apiKey": "LIVDSRZULELA"
+    },
+    "rabbitmq": {
+        "host": null
+    },
+    "templates": {
+        "enabled": true,
+        "allowTemplateCreation": true,
+        "allowDiscordTemplates": true,
+        "allowRaws": true
+    },
+    "defaults": {
+        "guild": {
+            "maxPresences": 250000,
+            "maxVideoChannelUsers": 200,
+            "afkTimeout": 300,
+            "defaultMessageNotifications": 1,
+            "explicitContentFilter": 0
+        },
+        "user": {
+            "premium": true,
+            "premiumType": 2,
+            "verified": true
+        }
+    },
+    "external": {
+        "twitter": null
+    },
+    "email": {
+        "provider": null,
+        "senderAddress": null,
+        "smtp": {
+            "host": null,
+            "port": null,
+            "secure": null,
+            "username": null,
+            "password": null
+        },
+        "mailgun": {
+            "username": null,
+            "apiKey": null,
+            "domain": null,
+            "isEuropean": true
+        },
+        "mailjet": {
+            "apiKey": null,
+            "apiSecret": null
+        },
+        "sendgrid": {
+            "apiKey": null
+        }
+    },
+    "passwordReset": {
+        "requireCaptcha": false
+    },
+    "user": {
+        "blockedContains": [
+            "discord",
+            "clyde",
+            "spacebar",
+            "steam",
+            "community",
+            "support",
+            "ticket"
+        ],
+        "blockedEquals": [
+            "everyone",
+            "here"
+        ],
+        "botsCanUseInvites": false
+    },
+    "offload": {
+        "gateway": {
+            "op12BaseUrl": null,
+            "op14BaseUrl": null
+        }
+    }
+}

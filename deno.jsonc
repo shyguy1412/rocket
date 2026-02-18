@@ -6,6 +6,8 @@
         "semiColons": true,
         "singleQuote": true,
         "bracePosition": "sameLine",
-        "jsx.bracketPosition": "sameLine"
+        "jsx.multiLineParens": "never",
+        "jsx.bracketPosition": "sameLine",
+        "useBraces": "always"
     }
 }

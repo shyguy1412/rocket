@@ -35,6 +35,9 @@
             "@/*": [
                 "src/*"
             ],
+            "@/schemas/*": [
+                "./spacebar_server/src/schemas/*"
+            ],
             "@core": [
                 "src/core/package/core.node"
             ],

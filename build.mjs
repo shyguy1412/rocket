@@ -1,5 +1,6 @@
 import { context } from 'esbuild';
 import { readFile } from 'fs/promises';
+import p from 'path';
 
 const WATCH = process.argv.includes('--watch');
 const HOST = process.argv[(process.argv.indexOf('--host') + 1) || -1] ??
@@ -41,6 +42,32 @@ const reloadPlugin = {
     },
 };
 
+/** @type import("esbuild").Plugin */
+const MetaImports = {
+    name: 'MetaImports',
+    setup(pluginBuild) {
+        pluginBuild.onResolve({ filter: /meta:.*/ }, (opts) => {
+            const namespace = opts.path.replace(/(meta:[A-Za-z_-]*).*/, '$1');
+
+            return {
+                path: opts.importer,
+                pluginData: opts,
+                namespace,
+            };
+        });
+
+        pluginBuild.onLoad({ filter: /.*/, namespace: 'meta:api' }, (opts) => {
+            const base = p.resolve(opts.pluginData.path.match(/(?<=\().*?(?=\))/)[0]);
+            const path = opts.path.replace(base, '').replace(/\.(t|j)sx?/, '');
+
+            return {
+                contents: path,
+                loader: 'text',
+            };
+        });
+    },
+};
+
 const createRenderContext = async () =>
     await context({
         entryPoints: [
@@ -48,7 +75,10 @@ const createRenderContext = async () =>
             'src/render/index.html',
         ],
         loader: { '.html': 'copy', '.woff2': 'copy' },
-        plugins: WATCH ? [reloadPlugin] : [],
+        plugins: [
+            ...(WATCH ? [reloadPlugin] : []),
+            MetaImports,
+        ],
         outbase: './src/render',
         outdir: './build',
         bundle: true,
@@ -61,6 +91,7 @@ const createRenderContext = async () =>
         },
         // minify: !WATCH,
         logLevel: 'info',
+        sourcemap: 'inline',
     });
 
 const renderCtx = await createRenderContext();

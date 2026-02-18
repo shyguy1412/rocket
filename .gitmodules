@@ -1,3 +1,7 @@
 [submodule "src/lib"]
 	path = src/lib
 	url = ../shylib
+[submodule "spacebar_server"]
+	path = spacebar_server
+	url = ../spacebar_server
+	branch = schema_fixes
