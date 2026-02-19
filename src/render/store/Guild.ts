@@ -26,9 +26,5 @@ export const GuildStore = createStore({
 });
 
 export const useGuilds = (): AsyncState<APIGuildArray> => {
-    useEffect(() => {
-        GuildStore.trigger.update();
-    }, []);
-
     return usePromise(useSelector(GuildStore, (state) => state.context.guilds));
 };

@@ -1,23 +1,37 @@
-import style from './Guild.module.css';
+import { Fragment, h } from 'preact';
+import { memo, useEffect } from 'preact/compat';
 
-import { h } from 'preact';
-import { memo } from 'preact/compat';
-
-import { get_guilds } from '@/api/users/@me/guilds';
-import { useAsync } from '@/lib/hooks';
-import { LoadingScreen } from '@/render/components/LoadingScreen';
-import { useRoute } from '@/lib/Router';
 import { GuildRouter } from '@/render/views/Home';
 import { Lumber } from '@/lib/log/Lumber';
+import { ChannelList } from '@/render/components/ChannelList';
+import { createRouter, RouteTable, useRoute, useView, View } from '@/lib/Router';
+import { Channel } from '@/render/views/Channel';
 
 export namespace Guild {
     export type Props = {};
 }
+
+export const ChannelRouter = createRouter<RouteTable<string, View<{}>>>(
+    { '': () => <div>NONE</div> },
+    '',
+    Channel,
+);
+
 const _Guild = ({}: Guild.Props) => {
     const guildID = useRoute(GuildRouter).at(-1)!;
 
     Lumber.log(Lumber.RENDER, 'GUILD RENDER');
 
-    return <div>{guildID}</div>;
+    const Channel = useView(ChannelRouter);
+
+    console.log({ Channel });
+
+    return <>
+        <div>
+            {guildID}
+            <ChannelList></ChannelList>
+        </div>
+        <Channel></Channel>
+    </>;
 };
 export const Guild = memo(_Guild);

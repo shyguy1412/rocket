@@ -8,6 +8,7 @@
         "dev": "concurrently -k \"npm:watch\" \"wait-on http://127.0.0.1:3000 && DEV=true nodemon -w build/main.js -w build/preload.js --exec electron build/main.js\"",
         "prestart": "npm run build",
         "start": "electron ./build/main.js",
+        "typecheck": "tsc --noEmit -p ./tsconfig.json",
         "build": "node build.mjs && electron-builder",
         "cargo-watch": "nodemon -w ./src/core -i ./src/core/package -e rs --exec npm run cargo-build",
         "cargo-build": "TS_DECL_GEN=true cargo build --message-format=json-render-diagnostics > cargo.log",
