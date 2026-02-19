@@ -13,11 +13,11 @@ import { Lumber } from '@/lib/log/Lumber';
 export namespace Guild {
     export type Props = {};
 }
-const GuildComponent = ({}: Guild.Props) => {
+const _Guild = ({}: Guild.Props) => {
     const guildID = useRoute(GuildRouter).at(-1)!;
 
     Lumber.log(Lumber.RENDER, 'GUILD RENDER');
 
     return <div>{guildID}</div>;
 };
-export const Guild = memo(GuildComponent);
+export const Guild = memo(_Guild);

@@ -6,7 +6,7 @@ import { useRouter } from '@/lib/Router';
 import { FormController } from '@/render/views/Login/FormController';
 import { Lumber } from '@/lib/log/Lumber';
 
-export const RegisterFormComponent = (props: FormController.FormProps) => {
+export const _RegisterForm = (props: FormController.FormProps) => {
     const { router, onSubmit } = props;
     const { setRoute } = useRouter(router);
 
@@ -62,4 +62,4 @@ export const RegisterFormComponent = (props: FormController.FormProps) => {
     </form>;
 };
 
-export const RegisterForm = memo(RegisterFormComponent);
+export const RegisterForm = memo(_RegisterForm);

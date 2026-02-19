@@ -23,7 +23,7 @@ export const GuildRouter = createRouter<RouteTable<string, View<{}>>>(
     Guild,
 );
 
-const HomeComponent = ({}: Home.Props) => {
+const _Home = ({}: Home.Props) => {
     const guilds = useGuilds();
     const View = useView(GuildRouter);
 
@@ -39,4 +39,4 @@ const HomeComponent = ({}: Home.Props) => {
     </div>;
 };
 
-export const Home = memo(HomeComponent);
+export const Home = memo(_Home);

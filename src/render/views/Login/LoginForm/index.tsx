@@ -6,7 +6,7 @@ import { memo } from 'preact/compat';
 import { FormController } from '@/render/views/Login/FormController';
 import { Lumber } from '@/lib/log/Lumber';
 
-const LoginFormComponent = (props: FormController.FormProps) => {
+const _LoginForm = (props: FormController.FormProps) => {
     const { router, onSubmit } = props;
     const { setRoute } = useRouter(router);
 
@@ -41,4 +41,4 @@ const LoginFormComponent = (props: FormController.FormProps) => {
     </form>;
 };
 
-export const LoginForm = memo(LoginFormComponent);
+export const LoginForm = memo(_LoginForm);

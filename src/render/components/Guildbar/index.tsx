@@ -16,7 +16,7 @@ export namespace Guildbar {
     };
 }
 
-const GuildbarComponent = ({ guilds }: Guildbar.Props) => {
+const _Guildbar = ({ guilds }: Guildbar.Props) => {
     const { setRoute } = useRouter(GuildRouter);
 
     Lumber.log(Lumber.RENDER, 'GUILDBAR RENDER');
@@ -32,4 +32,4 @@ const GuildbarComponent = ({ guilds }: Guildbar.Props) => {
         )}
     </ul>;
 };
-export const Guildbar = memo(GuildbarComponent);
+export const Guildbar = memo(_Guildbar);

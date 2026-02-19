@@ -20,7 +20,7 @@ export namespace FormController {
     };
 }
 
-const FormControllerComponent = <B, R>(props: FormController.Props<B, R>) => {
+const _FormController = <B, R>(props: FormController.Props<B, R>) => {
     const { apiCall, Form, router, onSuccess } = props;
     Lumber.log(Lumber.RENDER, 'FORM CONTROLLER RENDER');
 
@@ -46,7 +46,7 @@ const FormControllerComponent = <B, R>(props: FormController.Props<B, R>) => {
     );
 };
 
-export const FormController = memo(FormControllerComponent);
+export const FormController = memo(_FormController);
 
 function validateForm<R>(
     form: HTMLFormElement,

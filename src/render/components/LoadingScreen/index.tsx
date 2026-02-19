@@ -7,10 +7,10 @@ export namespace LoadingScreen {
     export type Props = {};
 }
 
-const LoadingScreenComponent = ({}: LoadingScreen.Props) => {
+const _LoadingScreen = ({}: LoadingScreen.Props) => {
     Lumber.log(Lumber.RENDER, 'LOADINGSCREEN RENDER');
 
     return <div>Loading</div>;
 };
 
-export const LoadingScreen = memo(LoadingScreenComponent);
+export const LoadingScreen = memo(_LoadingScreen);
