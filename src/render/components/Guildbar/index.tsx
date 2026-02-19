@@ -8,6 +8,7 @@ import { LoadingScreen } from '@/render/components/LoadingScreen';
 import { APIGuildArray } from '@/schemas/responses';
 import { useRouter } from '@/lib/Router';
 import { GuildRouter } from '@/render/views/Home';
+import { Lumber } from '@/lib/log/Lumber';
 
 export namespace Guildbar {
     export type Props = {
@@ -17,6 +18,8 @@ export namespace Guildbar {
 
 const GuildbarComponent = ({ guilds }: Guildbar.Props) => {
     const { setRoute } = useRouter(GuildRouter);
+
+    Lumber.log(Lumber.RENDER, 'GUILDBAR RENDER');
 
     return <ul>
         {[{ id: 'DM', name: 'DM' }, ...guilds].map((guild, key) =>

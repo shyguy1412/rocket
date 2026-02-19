@@ -9,6 +9,7 @@ import { GuildStore, useGuilds } from '@/render/store/Guild';
 import { createRouter, RouteTable, useView, View } from '@/lib/Router';
 import { LoadingScreen } from '@/render/components/LoadingScreen';
 import { Guild } from '@/render/views/Guild';
+import { Lumber } from '@/lib/log/Lumber';
 
 export namespace Home {
     export type Props = {};
@@ -24,8 +25,9 @@ export const GuildRouter = createRouter<RouteTable<string, View<{}>>>(
 
 const HomeComponent = ({}: Home.Props) => {
     const guilds = useGuilds();
-
     const View = useView(GuildRouter);
+
+    Lumber.log(Lumber.RENDER, 'HOME RENDER');
 
     if (!guilds.resolved) {
         return <LoadingScreen></LoadingScreen>;

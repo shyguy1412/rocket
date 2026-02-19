@@ -1,3 +1,4 @@
+import { Lumber } from '@/lib/log/Lumber';
 import { Result } from '@/lib/types/Result';
 import {
     APIErrorOrCaptchaResponse,
@@ -23,6 +24,10 @@ export type Endpoint = {
 export type ApiCall<B, R = unknown> = (
     body: B,
 ) => Promise<ApiResult<R>>;
+
+const API_ERROR_LOG_CHANNEL = 'API_ERROR_LOG_CHANNEL';
+Lumber.createChannel(API_ERROR_LOG_CHANNEL, 3);
+const logApiError = Lumber.getLogger(API_ERROR_LOG_CHANNEL);
 
 export const buildApiCall = <B, R>(endpoint: Endpoint) =>
 async (
@@ -70,10 +75,9 @@ function parseResponse<T>(
     }
 
     if (isErrorResponse(response)) {
+        logApiError(response.body);
         return Result.Err(formatAPIErrorResponse(response.body));
     }
-
-    console.log(response);
 
     // TS seems to struggle with discrimination. Get more racist ffs
     return Result.Ok(response.body as T);

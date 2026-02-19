@@ -8,12 +8,15 @@ import { useAsync } from '@/lib/hooks';
 import { LoadingScreen } from '@/render/components/LoadingScreen';
 import { useRoute } from '@/lib/Router';
 import { GuildRouter } from '@/render/views/Home';
+import { Lumber } from '@/lib/log/Lumber';
 
 export namespace Guild {
     export type Props = {};
 }
 const GuildComponent = ({}: Guild.Props) => {
     const guildID = useRoute(GuildRouter).at(-1)!;
+
+    Lumber.log(Lumber.RENDER, 'GUILD RENDER');
 
     return <div>{guildID}</div>;
 };

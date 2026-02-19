@@ -4,10 +4,13 @@ import style from './LoginForm.module.css';
 import { h } from 'preact';
 import { memo } from 'preact/compat';
 import { FormController } from '@/render/views/Login/FormController';
+import { Lumber } from '@/lib/log/Lumber';
 
 const LoginFormComponent = (props: FormController.FormProps) => {
     const { router, onSubmit } = props;
     const { setRoute } = useRouter(router);
+
+    Lumber.log(Lumber.RENDER, 'LOGIN FORM RENDER');
 
     return <form
         class={style.form}

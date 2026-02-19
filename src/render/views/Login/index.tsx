@@ -13,6 +13,7 @@ import { useAsync, usePromise } from '@/lib/hooks';
 import { get_me } from '@/api/users/@me';
 import { LoadingScreen } from '@/render/components/LoadingScreen';
 import { SettingsStore } from '@/render/store/Settings';
+import { Lumber } from '@/lib/log/Lumber';
 
 namespace Login {
     export type Props = {};
@@ -44,6 +45,8 @@ export const Login = memo(({}: Login.Props) => {
     const tryLogin = usePromise(get_me);
 
     const View = useView(LoginRouter);
+
+    Lumber.log(Lumber.RENDER, 'LOGIN RENDER');
 
     const onSuccess = (response: { token: string | null }) => {
         if (response.token == null) {

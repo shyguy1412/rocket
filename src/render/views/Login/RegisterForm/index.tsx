@@ -4,10 +4,13 @@ import { h } from 'preact';
 import { memo } from 'preact/compat';
 import { useRouter } from '@/lib/Router';
 import { FormController } from '@/render/views/Login/FormController';
+import { Lumber } from '@/lib/log/Lumber';
 
 export const RegisterFormComponent = (props: FormController.FormProps) => {
     const { router, onSubmit } = props;
     const { setRoute } = useRouter(router);
+
+    Lumber.log(Lumber.RENDER, 'REGISTER FORM RENDER');
 
     return <form class={style.form} onSubmit={onSubmit} action=''>
         <label for='email'>Email</label>
