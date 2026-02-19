@@ -2,3 +2,91 @@ html, body {
     width: 100%;
     height: 100%;
 }
+
+:root {
+    color-scheme: light dark;
+
+    /** Base colors */
+    --clr-dark-a0: #000000;
+    --clr-light-a0: #ffffff;
+
+    /** Theme primary colors */
+    --clr-primary-a0: #ff00d0;
+    --clr-primary-a10: lch(from var(--clr-primary-a0) calc(l + 10) c h);
+    --clr-primary-a20: lch(from var(--clr-primary-a0) calc(l + 20) c h);
+    --clr-primary-a30: lch(from var(--clr-primary-a0) calc(l + 30) c h);
+    --clr-primary-a40: lch(from var(--clr-primary-a0) calc(l + 40) c h);
+    --clr-primary-a50: lch(from var(--clr-primary-a0) calc(l + 50) c h);
+
+    --clr-error: #ee260b;
+    --clr-warning: #ffae00;
+    --clr-success: #0b8600;
+
+    /** Theme surface colors */
+    --clr-surface-dark-a0: #121212;
+    --clr-surface-dark-a10: lch(from var(--clr-surface-dark-a0) calc(l + 10) c h);
+    --clr-surface-dark-a20: lch(from var(--clr-surface-dark-a0) calc(l + 20) c h);
+    --clr-surface-dark-a30: lch(from var(--clr-surface-dark-a0) calc(l + 30) c h);
+    --clr-surface-dark-a40: lch(from var(--clr-surface-dark-a0) calc(l + 40) c h);
+    --clr-surface-dark-a50: lch(from var(--clr-surface-dark-a0) calc(l + 50) c h);
+
+    /** Theme foreground colors */
+    --clr-surface-light-a0: #ffffff;
+    --clr-surface-light-a10: lch(from var(--clr-surface-light-a0) calc(l - 10) c h);
+    --clr-surface-light-a20: lch(from var(--clr-surface-light-a0) calc(l - 20) c h);
+    --clr-surface-light-a30: lch(from var(--clr-surface-light-a0) calc(l - 30) c h);
+    --clr-surface-light-a40: lch(from var(--clr-surface-light-a0) calc(l - 40) c h);
+    --clr-surface-light-a50: lch(from var(--clr-surface-light-a0) calc(l - 50) c h);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        /** Theme surface colors */
+        --clr-surface-a0: var(--clr-surface-light-a0);
+        --clr-surface-a10: var(--clr-surface-light-a10);
+        --clr-surface-a20: var(--clr-surface-light-a20);
+        --clr-surface-a30: var(--clr-surface-light-a30);
+        --clr-surface-a40: var(--clr-surface-light-a40);
+        --clr-surface-a50: var(--clr-surface-light-a50);
+
+        /** Theme foreground colors */
+        --clr-foreground-a0: var(--clr-surface-dark-a0);
+        --clr-foreground-a10: var(--clr-surface-dark-a10);
+        --clr-foreground-a20: var(--clr-surface-dark-a20);
+        --clr-foreground-a30: var(--clr-surface-dark-a30);
+        --clr-foreground-a40: var(--clr-surface-dark-a40);
+        --clr-foreground-a50: var(--clr-surface-dark-a50);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /** Theme surface colors */
+        --clr-surface-a0: var(--clr-surface-dark-a0);
+        --clr-surface-a10: var(--clr-surface-dark-a10);
+        --clr-surface-a20: var(--clr-surface-dark-a20);
+        --clr-surface-a30: var(--clr-surface-dark-a30);
+        --clr-surface-a40: var(--clr-surface-dark-a40);
+        --clr-surface-a50: var(--clr-surface-dark-a50);
+
+        /** Theme foreground colors */
+        --clr-foreground-a0: var(--clr-surface-light-a0);
+        --clr-foreground-a10: var(--clr-surface-light-a10);
+        --clr-foreground-a20: var(--clr-surface-light-a20);
+        --clr-foreground-a30: var(--clr-surface-light-a30);
+        --clr-foreground-a40: var(--clr-surface-light-a40);
+        --clr-foreground-a50: var(--clr-surface-light-a50);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        color-scheme: light;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}

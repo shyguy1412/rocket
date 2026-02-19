@@ -1,11 +1,32 @@
 import style from './Guildbar.module.css';
-import { h } from 'preact';
-import { memo } from 'preact/compat';
 
-namespace Guildbar {
-    export type Props = {};
+import { h } from 'preact';
+import { memo, useEffect } from 'preact/compat';
+
+import { GuildStore, useGuilds } from '@/render/store/Guild';
+import { LoadingScreen } from '@/render/components/LoadingScreen';
+import { APIGuildArray } from '@/schemas/responses';
+import { useRouter } from '@/lib/Router';
+import { GuildRouter } from '@/render/views/Home';
+
+export namespace Guildbar {
+    export type Props = {
+        guilds: APIGuildArray;
+    };
 }
 
-export const Guildbar = memo(({}: Guildbar.Props) => {
-    return <div></div>;
-});
+const GuildbarComponent = ({ guilds }: Guildbar.Props) => {
+    const { setRoute } = useRouter(GuildRouter);
+
+    return <ul>
+        {[{ id: 'DM', name: 'DM' }, ...guilds].map((guild, key) =>
+            <li
+                key={key}
+                onClick={() => setRoute(guild.id)}
+            >
+                {guild.name}
+            </li>
+        )}
+    </ul>;
+};
+export const Guildbar = memo(GuildbarComponent);

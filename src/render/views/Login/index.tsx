@@ -1,38 +1,71 @@
-import style from "./Login.module.css";
-import { h } from "preact";
-import { memo, useCallback } from "preact/compat";
+import { Fragment, h } from 'preact';
+import { memo, useMemo, useState } from 'preact/compat';
 
-import { login } from "@/api/auth/login";
-import { register } from "@/api/auth/register";
-import { Result } from "@/lib/types/Result";
+import { LoginForm } from '@/render/views/Login/LoginForm';
+import { createRouter, useRouter, useView } from '@/lib/Router';
+import { RegisterForm } from '@/render/views/Login/RegisterForm';
+import { ApiCall } from '@/api';
+import { FormController } from '@/render/views/Login/FormController';
+import { register } from '@/api/auth/register';
+import { login } from '@/api/auth/login';
+import { AppRouter } from '@/render/components/App';
+import { useAsync, usePromise } from '@/lib/hooks';
+import { get_me } from '@/api/users/@me';
+import { LoadingScreen } from '@/render/components/LoadingScreen';
+import { SettingsStore } from '@/render/store/Settings';
 
 namespace Login {
     export type Props = {};
 }
-export const Login = memo(({}: Login.Props) => {
-    const onClick = useCallback(async () => {
-        let result = await register({
-            username: "shy",
-            password: "password",
-            consent: true,
-            email: "test@mail.com",
-            date_of_birth: new Date("2000-08-25"),
-        });
 
-        if (result.isOk()) {
-            return console.log("VALUE: ", result.value);
-        }
-    }, []);
-
-    return (
-        <div>
-            LOGIN!
-
-            <button
-                onClick={onClick}
-            >
-                LOGIN TEST!
-            </button>
-        </div>
+const createForm =
+    <B, R>(apiCall: ApiCall<B, R>, form: FormController.Form) =>
+    (props: { router: any; onSuccess: (response: R) => void }) => (
+        <FormController<B, R>
+            router={props.router}
+            apiCall={apiCall}
+            Form={form}
+            onSuccess={props.onSuccess}
+        />
     );
+
+const createLoginRouter = () =>
+    createRouter({
+        login: createForm(login, LoginForm),
+        register: createForm(register, RegisterForm),
+    }, 'login');
+
+export type LoginRouter = ReturnType<typeof createLoginRouter>;
+
+export const Login = memo(({}: Login.Props) => {
+    const { setRoute } = useRouter(AppRouter);
+
+    const LoginRouter = useMemo(createLoginRouter, []);
+    const tryLogin = usePromise(get_me);
+
+    const View = useView(LoginRouter);
+
+    const onSuccess = (response: { token: string | null }) => {
+        if (response.token == null) {
+            throw new Error('Not yet implemented');
+        }
+
+        localStorage.setItem('token', response.token);
+
+        setRoute('home');
+    };
+
+    const notLoggedIn = ((localStorage.getItem('token') ?? '') == '') ||
+        (tryLogin.resolved && tryLogin.value.isError());
+
+    if (notLoggedIn) {
+        return <View router={LoginRouter} onSuccess={onSuccess} />;
+    }
+
+    if (tryLogin.resolved && tryLogin.value.isOk()) {
+        SettingsStore.trigger.set(tryLogin.value.value);
+        setRoute('home');
+    }
+
+    return <LoadingScreen />;
 });

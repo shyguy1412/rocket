@@ -43,6 +43,7 @@
     },
     "dependencies": {
         "@xstate/store": "^3.15.0",
-        "@xstate/store-react": "^1.0.1"
+        "@xstate/store-react": "^1.0.1",
+        "i18next": "^25.8.11"
     }
 }

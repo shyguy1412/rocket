@@ -1,0 +1,24 @@
+div:has(div.swatch) > .swatch:nth-child(1) {
+    height: 10px;
+    background-color: var(--clr-primary-a0);
+}
+div:has(div.swatch) > .swatch:nth-child(2) {
+    height: 10px;
+    background-color: var(--clr-primary-a10);
+}
+div:has(div.swatch) > .swatch:nth-child(3) {
+    height: 10px;
+    background-color: var(--clr-primary-a20);
+}
+div:has(div.swatch) > .swatch:nth-child(4) {
+    height: 10px;
+    background-color: var(--clr-primary-a30);
+}
+div:has(div.swatch) > .swatch:nth-child(5) {
+    height: 10px;
+    background-color: var(--clr-primary-a40);
+}
+div:has(div.swatch) > .swatch:nth-child(6) {
+    height: 10px;
+    background-color: var(--clr-primary-a50);
+}

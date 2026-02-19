@@ -57,8 +57,13 @@ const MetaImports = {
         });
 
         pluginBuild.onLoad({ filter: /.*/, namespace: 'meta:api' }, (opts) => {
-            const base = p.resolve(opts.pluginData.path.match(/(?<=\().*?(?=\))/)[0]);
-            const path = opts.path.replace(base, '').replace(/\.(t|j)sx?/, '');
+            const base = p.resolve(
+                opts.pluginData.path.match(/(?<=\().*?(?=\))/)[0],
+            );
+            const path = opts.path.replace(base, '').replace(
+                /(index)?\.(t|j)sx?/,
+                '',
+            );
 
             return {
                 contents: path,
@@ -85,7 +90,7 @@ const createRenderContext = async () =>
         format: 'esm',
         platform: 'browser',
         alias: {
-            'react': 'preact/compat',
+            react: 'preact/compat',
             'react-dom': 'preact/compat',
             'react-reconciler': 'preact-reconciler',
         },

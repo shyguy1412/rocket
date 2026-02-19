@@ -11,6 +11,7 @@
         "deno.disablePaths": [
             "./"
         ],
+        "deno.config": "./deno.jsonc",
         "editor.formatOnSave": true
     }
 }

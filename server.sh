@@ -1,4 +1,5 @@
 #! /bin/env bash
+# docker rm -f spacebar_db
 docker run --network host --name spacebar_db -e POSTGRES_PASSWORD=pass -d postgres
 docker start spacebar_db
 cd spacebar_server

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { app, BrowserWindow, Menu, MenuItem, session } from 'electron';
+import { app, BrowserWindow, Menu, MenuItem, protocol, session } from 'electron';
 
 //TEMP
 const i18n = {
