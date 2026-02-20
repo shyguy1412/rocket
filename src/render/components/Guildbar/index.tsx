@@ -1,23 +1,18 @@
-import style from './Guildbar.module.css';
-
 import { h } from 'preact';
-import { memo, useEffect } from 'preact/compat';
+import { memo } from 'preact/compat';
 
-import { GuildStore, useGuilds } from '@/render/store/Guild';
-import { LoadingScreen } from '@/render/components/LoadingScreen';
-import { APIGuildArray } from '@/schemas/responses';
+import { useGuilds } from '@/render/store/Guild';
 import { useRouter } from '@/lib/Router';
 import { GuildRouter } from '@/render/views/Home';
 import { Lumber } from '@/lib/log/Lumber';
 
 export namespace Guildbar {
-    export type Props = {
-        guilds: APIGuildArray;
-    };
+    export type Props = {};
 }
 
-const _Guildbar = ({ guilds }: Guildbar.Props) => {
+const _Guildbar = ({}: Guildbar.Props) => {
     const { setRoute } = useRouter(GuildRouter);
+    const guilds = useGuilds();
 
     Lumber.log(Lumber.RENDER, 'GUILDBAR RENDER');
 

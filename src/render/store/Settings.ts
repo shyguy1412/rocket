@@ -1,4 +1,4 @@
-import { get_guilds } from '@/api/users/@me/guilds';
+import { getGuilds } from '@/api/users/@me/guilds';
 import { AsyncState, usePromise } from '@/lib/hooks';
 import { Result } from '@/lib/types/Result';
 import { PrivateUser } from '@/schemas/api';

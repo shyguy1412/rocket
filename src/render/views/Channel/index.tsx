@@ -1,5 +1,12 @@
 import { h } from 'preact';
-import { memo, useCallback, useContext, useEffect, useState } from 'preact/compat';
+import {
+    memo,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'preact/compat';
 
 import { useRoute } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
@@ -12,16 +19,16 @@ import { GuildRouter, SocketContext } from '@/render/views/Home';
 import { getChannel } from '@/api/channels/#channel_id';
 import { getMessages, sendMessage } from '@/api/channels/#channel_id/messages';
 import { APIMessageArray } from '@/schemas/responses';
+import { GatewaySocket } from '@/render/lib/socket';
 
 export namespace Channel {
     export type Props = {};
 }
 const _Channel = ({}: Channel.Props) => {
-    const guildID = useRoute(GuildRouter).at(-1)!;
     const channelID = useRoute(ChannelRouter).at(-1)!;
-    const channel = useChannels(guildID).find((channel) => channel.id == channelID);
+    const guildID = useRoute(GuildRouter).at(-1)!;
     const [messages, setMessages] = useState([] as APIMessageArray);
-    const socket = useContext(SocketContext);
+    const channelName = useChannels(guildID).find((c) => c.id == channelID)!.name;
 
     const getChannelMessages = useCallback(
         () => getMessages(channelID),
@@ -35,37 +42,22 @@ const _Channel = ({}: Channel.Props) => {
             .then((response) => response.unwrap())
             .then((messages) => setMessages(messages.toReversed()))
             .catch((err) => console.error(err));
-    }, []);
+    }, [channelID]);
 
     useEffect(() => {
-        if (socket.isError()) {
-            return;
-        }
-
         const controller = new AbortController();
 
-        socket.value.addEventListener('message', (ev) => {
-            const payload = JSON.parse(ev.data);
-            if (payload.t == 'MESSAGE_CREATE' && payload.d.channel_id == channelID) {
-                setMessages((messages) => {
-                    return [...messages, payload.d];
-                });
-            }
-
-            if (payload.t == 'MESSAGE_UPDATE') {
-                console.log('UPDATE NOT YET IMPLEMENTED');
-
-                // setMessages((messages) => {
-                //     return [...messages, payload.d];
-                // });
-            }
+        GatewaySocket.addEventListener('MESSAGE_CREATE', (ev) => {
+            setMessages((messages) => {
+                return [...messages, ev.detail];
+            });
         });
 
         return () => controller.abort();
-    }, [socket]);
+    }, [channelID]);
 
     return <div>
-        {channelID}
+        {channelName}
         <ul>
             {messages.map((m) =>
                 <li>
@@ -76,12 +68,12 @@ const _Channel = ({}: Channel.Props) => {
         <form
             onSubmit={(e) => {
                 e.preventDefault();
-                console.log(e.currentTarget.children[0].value);
+                const input = e.currentTarget.querySelector('input')!;
                 sendMessage(channelID, {
-                    content: e.currentTarget.children[0].value,
+                    content: input.value,
                 });
 
-                e.currentTarget.children[0].value = '';
+                input.value = '';
             }}
         >
             <input type='text' />
