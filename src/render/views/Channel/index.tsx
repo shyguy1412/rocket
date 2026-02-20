@@ -1,22 +1,11 @@
 import { h } from 'preact';
-import {
-    memo,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from 'preact/compat';
+import { memo, useCallback, useEffect, useState } from 'preact/compat';
 
 import { useRoute } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
-import { usePromise } from '@/lib/hooks';
-import { preloadMessages } from '@/api/channels/preload-messages';
-import { LoadingScreen } from '@/render/components/LoadingScreen';
 import { useChannels } from '@/render/store/Channel';
-import { GuildRouter, SocketContext } from '@/render/views/Home';
-import { getChannel } from '@/api/channels/#channel_id';
+import { GuildRouter } from '@/render/views/Home';
 import { getMessages, sendMessage } from '@/api/channels/#channel_id/messages';
 import { APIMessageArray } from '@/schemas/responses';
 import { GatewaySocket } from '@/render/lib/socket';
@@ -28,7 +17,7 @@ const _Channel = ({}: Channel.Props) => {
     const channelID = useRoute(ChannelRouter).at(-1)!;
     const guildID = useRoute(GuildRouter).at(-1)!;
     const [messages, setMessages] = useState([] as APIMessageArray);
-    const channelName = useChannels(guildID).find((c) => c.id == channelID)!.name;
+    const channelName = useChannels(guildID).find((c) => c.id == channelID)?.name;
 
     const getChannelMessages = useCallback(
         () => getMessages(channelID),
@@ -48,6 +37,9 @@ const _Channel = ({}: Channel.Props) => {
         const controller = new AbortController();
 
         GatewaySocket.addEventListener('MESSAGE_CREATE', (ev) => {
+            if (ev.detail.channel_id != channelID) {
+                return;
+            }
             setMessages((messages) => {
                 return [...messages, ev.detail];
             });

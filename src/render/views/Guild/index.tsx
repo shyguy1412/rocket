@@ -14,19 +14,22 @@ export namespace Guild {
 
 export const ChannelRouter = createRouter<RouteTable<string, View<{}>>>(
     { '': () => <div>NONE</div> },
-    '',
+    JSON.parse(localStorage.getItem('channel-router') ?? '""'),
     Channel,
 );
 
+ChannelRouter.subscribe(() => {
+    const route = ChannelRouter.getSnapshot().context.route;
+    localStorage.setItem('channel-router', JSON.stringify(route));
+});
+
 const _Guild = ({}: Guild.Props) => {
     const guildID = useRoute(GuildRouter).at(-1)!;
-    const guildName = useGuilds().find((g) => g.id == guildID)?.name!;
+    const guildName = useGuilds().find((g) => g.id == guildID)?.name ?? '';
 
     Lumber.log(Lumber.RENDER, 'GUILD RENDER');
 
     const Channel = useView(ChannelRouter);
-
-    console.log({ Channel });
 
     return <>
         <div>
