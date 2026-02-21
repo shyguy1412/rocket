@@ -1,1 +1,17 @@
+.channel {
+    display: flex;
+    flex-direction: column;
+}
 
+.channel ul {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.channel form {
+    display: flex;
+}
+
+.channel form input[type='text'] {
+    width: 100%;
+}

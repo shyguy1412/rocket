@@ -1,3 +1,5 @@
+import style from './Channel.module.css';
+
 import { h } from 'preact';
 import { memo, useCallback, useEffect, useState } from 'preact/compat';
 
@@ -48,9 +50,11 @@ const _Channel = ({}: Channel.Props) => {
         return () => controller.abort();
     }, [channelID]);
 
-    return <div>
+    return <div class={style.channel}>
         {channelName}
-        <ul>
+        <ul
+            ref={(r) => r?.scrollTo(0, r.scrollHeight)}
+        >
             {messages.map((m) =>
                 <li>
                     {m.author?.username}#{m.author?.discriminator}: {m.content}

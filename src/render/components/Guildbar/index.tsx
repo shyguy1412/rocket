@@ -1,3 +1,5 @@
+import style from './Guildbar.module.css';
+
 import { h } from 'preact';
 import { memo } from 'preact/compat';
 
@@ -16,7 +18,7 @@ const _Guildbar = ({}: Guildbar.Props) => {
 
     Lumber.log(Lumber.RENDER, 'GUILDBAR RENDER');
 
-    return <ul>
+    return <ul class={style.guildbar}>
         {[{ id: 'DM', name: 'DM' }, ...guilds].map((guild, key) =>
             <li
                 key={key}

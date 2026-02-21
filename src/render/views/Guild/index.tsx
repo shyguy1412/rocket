@@ -24,18 +24,12 @@ ChannelRouter.subscribe(() => {
 });
 
 const _Guild = ({}: Guild.Props) => {
-    const guildID = useRoute(GuildRouter).at(-1)!;
-    const guildName = useGuilds().find((g) => g.id == guildID)?.name ?? '';
-
     Lumber.log(Lumber.RENDER, 'GUILD RENDER');
 
     const Channel = useView(ChannelRouter);
 
     return <>
-        <div>
-            {guildName}
-            <ChannelList></ChannelList>
-        </div>
+        <ChannelList></ChannelList>
         <Channel></Channel>
     </>;
 };
