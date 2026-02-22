@@ -6,8 +6,6 @@ import {
     CaptchaRequiredResponse,
 } from '@/schemas/responses';
 
-const API_SERVER = 'https://rory.server.spacebar.chat/api/v9';
-
 export type ApiResult<T> = Result<T, APIError>;
 export type ApiResponse<R, E = APIErrorOrCaptchaResponse> = {
     headers: Headers;
@@ -22,7 +20,9 @@ export type Endpoint = {
 };
 
 export type ApiCall<B, R = unknown> = (
-    body: B,
+    server: string,
+    body?: B,
+    token?: string,
 ) => Promise<ApiResult<R>>;
 
 const API_ERROR_LOG_CHANNEL = 'API_ERROR_LOG_CHANNEL';
@@ -31,14 +31,16 @@ const logApiError = Lumber.getLogger(API_ERROR_LOG_CHANNEL);
 
 export const buildApiCall = <B, R>(endpoint: Endpoint) =>
 async (
-    ...[body]: B[]
-): Promise<Result<R, APIError>> => {
+    instance: string,
+    body?: B,
+    token?: string,
+): Promise<ApiResult<R>> => {
     const { route, method, chaptchaRequired } = endpoint;
 
-    const request = fetch(`${API_SERVER}${route}`, {
+    const request = fetch(`${instance}/api/v9${route}`, {
         method,
         headers: {
-            Authorization: localStorage.getItem('token') ?? '',
+            Authorization: token ?? '',
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),

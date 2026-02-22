@@ -128,5 +128,5 @@
         // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
         "skipLibCheck": true /* Skip type checking all .d.ts files. */
     },
-    "exclude": ["./spacebar_server", "./src/lib"]
+    "exclude": ["./spacebar_server", "./src/lib/electron"]
 }

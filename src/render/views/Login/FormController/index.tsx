@@ -1,48 +1,107 @@
+import style, { form } from './FormController.module.css';
 import { h, TargetedSubmitEvent } from 'preact';
 import { memo } from 'preact/compat';
 import { ApiCall, ApiResult } from '@/api';
 import { Lumber } from '@/lib/log/Lumber';
+import { createModal, useModal } from '@/lib/components/Modal';
+import { Instance, InstanceStore, useInstances } from '@/render/store/Instance';
 
 export namespace FormController {
     export type Form = (props: FormProps) => h.JSX.Element;
 
     export type Props<B, R> = {
-        setRoute: (route: string) => void;
         apiCall: ApiCall<B, R>;
         Form: Form;
-        onSuccess: (response: R) => void;
+        onSuccess: (instance: string, response: R) => void;
     };
 
     export type FormProps = {
-        setRoute: (route: string) => void;
-        onSubmit: (e: TargetedSubmitEvent<HTMLFormElement>) => void;
+        // setRoute: (route: string) => void;
+        // onSubmit: (e: TargetedSubmitEvent<HTMLFormElement>) => void;
     };
 }
 
+const _AddInstanceModal = createModal(({ abort }) => {
+    const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const url = e.currentTarget.querySelector('input')!.value.replace(/\/?$/, '/');
+        fetch(`${url}.well-known/spacebar/client`)
+            .then((r) => r.json() as Promise<Instance>)
+            .catch(() => null)
+            .then((instance) => {
+                if (!instance) {
+                    throw new Error('not an instance');
+                }
+                InstanceStore.trigger.addInstance({ instance });
+                abort();
+            });
+    };
+
+    return <form onSubmit={onSubmit}>
+        <input type='text' name='instance-url' />
+        <input type='submit' hidden />
+    </form>;
+});
+
 const _FormController = <B, R>(props: FormController.Props<B, R>) => {
-    const { apiCall, Form, setRoute, onSuccess } = props;
     Lumber.log(Lumber.RENDER, 'FORM CONTROLLER RENDER');
+
+    const { apiCall, Form, onSuccess } = props;
+    const AddInstanceModal = useModal(_AddInstanceModal);
+
+    const instances = useInstances();
 
     const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        console.log('SUBMIT');
 
         const form = e.currentTarget;
         const formData = new FormData(form).entries().toArray();
         const requestBody = Object.fromEntries(
             formData,
-        ) as unknown as B;
+        ) as any;
 
-        apiCall(requestBody)
+        const instance = requestBody['form_controller_instance'];
+        delete requestBody['form_controller_instance'];
+
+        apiCall(instance, requestBody)
             .then((result) => validateForm(form, result))
-            .then((result) => result.map(onSuccess));
+            .then((result) => result.map((response) => onSuccess(instance, response)));
     };
 
-    return (
-        <Form setRoute={setRoute} onSubmit={onSubmit}>
-        </Form>
-    );
+    return <form class={style.form} onSubmit={onSubmit}>
+        <label for='form_controller_instance'>Instance</label>
+        <select
+            name='form_controller_instance'
+            value={instances[0]?.api.baseUrl ?? ''}
+            onChange={(e) => {
+                if (e.currentTarget.value != 'new') {
+                    return;
+                }
+                e.currentTarget.value = '';
+                AddInstanceModal.open({});
+            }}
+        >
+            {instances.map((instance, i) =>
+                <option key={i} value={instance.api.baseUrl}>
+                    {instance.api.baseUrl}
+                </option>
+            )}
+            <option
+                onClick={() => console.log('add')}
+                value={'new'}
+            >
+                Add Instance
+            </option>
+        </select>
+        {
+            /* <input
+            type='text'
+            name='form_controller_instance'
+            defaultValue='https://rory.server.spacebar.chat/api/v9'
+        /> */
+        }
+        <Form></Form>
+    </form>;
 };
 
 export const FormController = memo(_FormController);

@@ -1,12 +1,10 @@
 import { Fragment, h } from 'preact';
-import { memo, useEffect } from 'preact/compat';
+import { memo } from 'preact/compat';
 
-import { GuildRouter } from '@/render/views/Home';
 import { Lumber } from '@/lib/log/Lumber';
 import { ChannelList } from '@/render/components/ChannelList';
-import { createRouter, RouteTable, useRoute, useView, View } from '@/lib/Router';
+import { createRouter, RouteTable, useView, View } from '@/lib/Router';
 import { Channel } from '@/render/views/Channel';
-import { useGuilds } from '@/render/store/Guild';
 
 export namespace Guild {
     export type Props = {};

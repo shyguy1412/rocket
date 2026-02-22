@@ -1,17 +1,14 @@
-import style from './RegisterForm.module.css';
-
-import { h } from 'preact';
+import { Fragment, h } from 'preact';
 import { memo } from 'preact/compat';
-import { useRouter } from '@/lib/Router';
+
 import { FormController } from '@/render/views/Login/FormController';
 import { Lumber } from '@/lib/log/Lumber';
+import { LoginRouter } from '@/render/views/Login';
 
 export const _RegisterForm = (props: FormController.FormProps) => {
-    const { setRoute, onSubmit } = props;
-
     Lumber.log(Lumber.RENDER, 'REGISTER FORM RENDER');
 
-    return <form class={style.form} onSubmit={onSubmit} action=''>
+    return <>
         <label for='email'>Email</label>
         <input
             type='email'
@@ -56,9 +53,9 @@ export const _RegisterForm = (props: FormController.FormProps) => {
         <input
             type='reset'
             value={'Login'}
-            onClick={() => setRoute('login')}
+            onClick={() => LoginRouter.trigger.setRoute({ route: 'login' })}
         />
-    </form>;
+    </>;
 };
 
 export const RegisterForm = memo(_RegisterForm);

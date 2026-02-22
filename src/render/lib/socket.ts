@@ -1,4 +1,4 @@
-import { Payload } from 'spacebar_server/src/gateway';
+import { ProfileStore } from '@/render/store/Profile';
 
 export type GatewayEvent = 'MESSAGE_CREATE' | 'MESSAGE_UPDATE';
 
@@ -9,70 +9,85 @@ type addCustomEventListener = (
     options?: AddEventListenerOptions,
 ) => void;
 
-const eventTarget = new EventTarget();
-export const GatewaySocket = {
-    addEventListener: eventTarget.addEventListener.bind(
-        eventTarget,
-    ) as addCustomEventListener,
-    dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
-    removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+type GatewaySocket = {
+    addEventListener: addCustomEventListener;
+    dispatchEvent: EventTarget['dispatchEvent'];
+    removeEventListener: EventTarget['removeEventListener'];
 };
 
-let socket = new WebSocket(
-    'wss://gateway.rory.server.spacebar.chat/?encoding=json&v=9',
-);
+const RETRY_COUNT = 3;
+let current_try = 0;
 
-socket.addEventListener('open', () => setupSocket(socket), { once: true });
+const sockets: Record<string, GatewaySocket> = {};
 
-// export const openWebsocket = async () => {
-//     const socket = new WebSocket(
-//         'wss://gateway.rory.server.spacebar.chat/?encoding=json&v=9',
-//     );
+export const getGatewaySocket = (instance: string) => {
+    const url = '';
+    throw new Error('get gateway url by instance');
+    if (url in sockets) {
+        return sockets[url];
+    }
 
-//     await new Promise<WebSocket>((r) =>
-//         socket.addEventListener('open', () => r(socket), { once: true })
-//     );
+    let socket: WebSocket;
 
-//     let d: number | null = null;
-
-//     socket.addEventListener('message', (ev) => d = JSON.parse(ev.data).s ?? d);
-
-//     setInterval(() => {
-//         socket.send(JSON.stringify({ op: 1, d }));
-//     }, 30000);
-
-//     return socket;
-// };
-
-function setupSocket(socket: WebSocket) {
-    socket.addEventListener('message', (ev) => {
-        const data = JSON.parse(ev.data);
-        if ('t' in data) {
-            GatewaySocket.dispatchEvent(new CustomEvent(data.t + '', { detail: data.d }));
-        } else {
-            GatewaySocket.dispatchEvent(
-                new CustomEvent(data.op + '', { detail: data.d }),
-            );
+    const reconnect = () => {
+        if (current_try >= RETRY_COUNT) {
+            throw new Error('Can not connect to gateway');
         }
-    });
+        current_try += 1;
 
-    //authenticate socket connection
-    socket.send(JSON.stringify({
-        op: 2,
-        d: {
-            token: localStorage.getItem('token'),
-        },
-    }));
+        socket = new WebSocket(url);
 
-    GatewaySocket.addEventListener('10', (ev: CustomEvent) => {
-        let d: number | null = null;
+        socket.addEventListener('open', () => setupSocket(socket), { once: true });
+        socket.addEventListener('open', () => current_try = 0, { once: true });
+        socket.addEventListener('close', reconnect);
+    };
 
-        socket.addEventListener('message', (ev) => d = JSON.parse(ev.data).s ?? d);
+    const eventTarget = new EventTarget();
+    const GatewaySocket = {
+        addEventListener: eventTarget.addEventListener.bind(
+            eventTarget,
+        ) as addCustomEventListener,
+        dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
+        removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+    };
 
-        setInterval(() => {
-            socket.send(JSON.stringify({ op: 1, d }));
-        }, ev.detail.heartbeat_interval);
-    });
-}
-function setupHeartbeat() {
-}
+    reconnect();
+
+    function setupSocket(socket: WebSocket) {
+        socket.addEventListener('message', (ev) => {
+            const data = JSON.parse(ev.data);
+            if ('t' in data) {
+                GatewaySocket.dispatchEvent(
+                    new CustomEvent(data.t + '', { detail: data.d }),
+                );
+            } else {
+                GatewaySocket.dispatchEvent(
+                    new CustomEvent(data.op + '', { detail: data.d }),
+                );
+            }
+        });
+
+        const token = ProfileStore.get().context.tokens[instance] ?? '';
+
+        //authenticate socket connection
+        socket.send(JSON.stringify({
+            op: 2,
+            d: {
+                token,
+            },
+        }));
+
+        GatewaySocket.addEventListener('10', (ev: CustomEvent) => {
+            let d: number | null = null;
+
+            socket.addEventListener('message', (ev) => d = JSON.parse(ev.data).s ?? d);
+
+            setInterval(() => {
+                socket.send(JSON.stringify({ op: 1, d }));
+            }, ev.detail.heartbeat_interval);
+        });
+    }
+
+    sockets[url] = GatewaySocket;
+    return GatewaySocket;
+};

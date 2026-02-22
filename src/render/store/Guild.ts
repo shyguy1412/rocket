@@ -1,5 +1,5 @@
 import { getGuilds } from '@/api/users/@me/guilds';
-import { AsyncState, usePromise } from '@/lib/hooks';
+import { useInstance } from '@/render/hooks/useInstance';
 import { APIGuildArray } from '@/schemas/responses';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
@@ -16,6 +16,7 @@ export const GuildStore = createStore({
 
 export const useGuilds = () => {
     const empty = useMemo(() => [], []);
+    const instance = useInstance();
 
     const guilds = useSelector(
         GuildStore,
@@ -27,7 +28,7 @@ export const useGuilds = () => {
             return;
         }
 
-        getGuilds().then((result) =>
+        getGuilds(instance).then((result) =>
             result.map((guilds) => GuildStore.trigger.setGuilds({ guilds }))
         );
     }, guilds);

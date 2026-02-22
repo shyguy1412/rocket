@@ -5,12 +5,13 @@ import { Guildbar } from '@/render/components/Guildbar';
 import { createRouter, RouteTable, useView, View } from '@/lib/Router';
 import { Guild } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
+import { InstanceContext } from '@/render/hooks/useInstance';
 
 export namespace Home {
     export type Props = {};
 }
 
-export const GuildRouter = createRouter<RouteTable<string, View<{}>>>(
+export const GuildRouter = createRouter<RouteTable<string, View<Guild.Props>>>(
     {
         DM: () => <div>DM</div>,
     },
@@ -29,8 +30,10 @@ const _Home = ({}: Home.Props) => {
     const View = useView(GuildRouter);
 
     return <div class={style.home}>
-        <Guildbar></Guildbar>
-        <View></View>
+        <InstanceContext.Provider value='foo'>
+            <Guildbar></Guildbar>
+            <View></View>
+        </InstanceContext.Provider>
     </div>;
 };
 

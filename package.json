@@ -32,19 +32,20 @@
     "devDependencies": {
         "@neon-rs/cli": "^0.1.82",
         "concurrently": "^9.2.1",
-        "electron": "^40.4.1",
-        "electron-builder": "^26.7.0",
+        "electron": "^40.6.0",
+        "electron-builder": "^26.8.1",
         "esbuild": "^0.27.3",
-        "nodemon": "^3.1.11",
-        "normalize.css": "^8.0.1",
-        "preact": "^10.28.3",
+        "nodemon": "^3.1.14",
         "typescript": "^5.9.3",
         "typescript-plugin-css-modules": "^5.2.0",
         "wait-on": "^9.0.4"
     },
     "dependencies": {
+        "normalize.css": "^8.0.1",
+        "preact": "^10.28.4",
         "@xstate/store": "^3.15.0",
         "@xstate/store-react": "^1.0.1",
-        "i18next": "^25.8.11"
+        "i18next": "^25.8.13",
+        "react-spinners": "^0.17.0"
     }
 }

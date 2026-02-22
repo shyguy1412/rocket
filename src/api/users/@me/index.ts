@@ -2,7 +2,7 @@ import { ApiCall, buildApiCall } from '@/api';
 import { PrivateUser } from '@/schemas/api';
 import route from 'meta:api(./src/api)';
 
-export const get_me = buildApiCall({
+export const getMe = buildApiCall({
     route,
     method: 'GET',
     chaptchaRequired(response) {
