@@ -1,16 +1,16 @@
 import style from './Channel.module.css';
 
-import { h } from 'preact';
-import { memo, useCallback, useEffect, useState } from 'preact/compat';
+import { h, TargetedSubmitEvent } from 'preact';
+import { memo } from 'preact/compat';
 
 import { useRoute } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
 import { useChannels } from '@/render/store/Channel';
 import { GuildRouter } from '@/render/views/Home';
-import { getMessages, sendMessage } from '@/api/channels/#channel_id/messages';
-import { APIMessageArray } from '@/schemas/responses';
-import { GatewaySocket } from '@/render/lib/socket';
+import { sendMessage } from '@/api/channels/#channel_id/messages';
+import { Message } from '@/render/components/Component';
+import { useMessages } from '@/render/hooks/useMessages';
 
 export namespace Channel {
     export type Props = {};
@@ -18,59 +18,30 @@ export namespace Channel {
 const _Channel = ({}: Channel.Props) => {
     const channelID = useRoute(ChannelRouter).at(-1)!;
     const guildID = useRoute(GuildRouter).at(-1)!;
-    const [messages, setMessages] = useState([] as APIMessageArray);
     const channelName = useChannels(guildID).find((c) => c.id == channelID)?.name;
-
-    const getChannelMessages = useCallback(
-        () => getMessages(channelID),
-        [channelID],
-    );
+    const messages = useMessages(channelID);
 
     Lumber.log(Lumber.RENDER, 'CHANNEL RENDER');
 
-    useEffect(() => {
-        getChannelMessages()
-            .then((response) => response.unwrap())
-            .then((messages) => setMessages(messages.toReversed()))
-            .catch((err) => console.error(err));
-    }, [channelID]);
-
-    useEffect(() => {
-        const controller = new AbortController();
-
-        GatewaySocket.addEventListener('MESSAGE_CREATE', (ev) => {
-            if (ev.detail.channel_id != channelID) {
-                return;
-            }
-            setMessages((messages) => {
-                return [...messages, ev.detail];
-            });
+    const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const input = e.currentTarget.querySelector('input')!;
+        sendMessage(channelID, {
+            content: input.value,
         });
 
-        return () => controller.abort();
-    }, [channelID]);
+        input.value = '';
+    };
 
     return <div class={style.channel}>
         {channelName}
         <ul
             ref={(r) => r?.scrollTo(0, r.scrollHeight)}
         >
-            {messages.map((m) =>
-                <li>
-                    {m.author?.username}#{m.author?.discriminator}: {m.content}
-                </li>
-            )}
+            {messages.map((m, i) => <Message key={i} message={m} />)}
         </ul>
         <form
-            onSubmit={(e) => {
-                e.preventDefault();
-                const input = e.currentTarget.querySelector('input')!;
-                sendMessage(channelID, {
-                    content: input.value,
-                });
-
-                input.value = '';
-            }}
+            onSubmit={onSubmit}
         >
             <input type='text' />
             <input type='submit' hidden />

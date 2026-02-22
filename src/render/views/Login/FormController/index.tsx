@@ -1,6 +1,5 @@
 import { h, TargetedSubmitEvent } from 'preact';
 import { memo } from 'preact/compat';
-import { LoginRouter } from '@/render/views/Login';
 import { ApiCall, ApiResult } from '@/api';
 import { Lumber } from '@/lib/log/Lumber';
 
@@ -8,20 +7,20 @@ export namespace FormController {
     export type Form = (props: FormProps) => h.JSX.Element;
 
     export type Props<B, R> = {
-        router: LoginRouter;
+        setRoute: (route: string) => void;
         apiCall: ApiCall<B, R>;
         Form: Form;
         onSuccess: (response: R) => void;
     };
 
     export type FormProps = {
-        router: LoginRouter;
+        setRoute: (route: string) => void;
         onSubmit: (e: TargetedSubmitEvent<HTMLFormElement>) => void;
     };
 }
 
 const _FormController = <B, R>(props: FormController.Props<B, R>) => {
-    const { apiCall, Form, router, onSuccess } = props;
+    const { apiCall, Form, setRoute, onSuccess } = props;
     Lumber.log(Lumber.RENDER, 'FORM CONTROLLER RENDER');
 
     const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
@@ -41,7 +40,7 @@ const _FormController = <B, R>(props: FormController.Props<B, R>) => {
     };
 
     return (
-        <Form router={router} onSubmit={onSubmit}>
+        <Form setRoute={setRoute} onSubmit={onSubmit}>
         </Form>
     );
 };

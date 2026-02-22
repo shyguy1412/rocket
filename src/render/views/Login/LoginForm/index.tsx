@@ -7,8 +7,7 @@ import { FormController } from '@/render/views/Login/FormController';
 import { Lumber } from '@/lib/log/Lumber';
 
 const _LoginForm = (props: FormController.FormProps) => {
-    const { router, onSubmit } = props;
-    const { setRoute } = useRouter(router);
+    const { setRoute, onSubmit } = props;
 
     Lumber.log(Lumber.RENDER, 'LOGIN FORM RENDER');
 
