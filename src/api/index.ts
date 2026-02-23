@@ -1,10 +1,13 @@
 import { Lumber } from '@/lib/log/Lumber';
 import { Result } from '@/lib/types/Result';
+import { useInstance } from '@/render/store/Instance';
+import { useProfile } from '@/render/store/Profile';
 import {
     APIErrorOrCaptchaResponse,
     APIErrorResponse,
     CaptchaRequiredResponse,
 } from '@/schemas/responses';
+import { useCallback } from 'preact/hooks';
 
 export type ApiResult<T> = Result<T, APIError>;
 export type ApiResponse<R, E = APIErrorOrCaptchaResponse> = {
@@ -19,8 +22,8 @@ export type Endpoint = {
     chaptchaRequired?: (response: CaptchaRequiredResponse) => unknown;
 };
 
-export type ApiCall<B, R = unknown> = (
-    server: string,
+export type EndpointCall<B, R = unknown> = (
+    endpoint: string,
     body?: B,
     token?: string,
 ) => Promise<ApiResult<R>>;
@@ -62,6 +65,27 @@ async (
         })
         .mapErr((err) => parseError(err));
 };
+
+export type ApiCall<P extends string[], B, R> = (
+    ...args: [string, P, B, string]
+) => Promise<ApiResult<R>>;
+
+/**
+ * Wraps an API call with the credentials provided by the current context
+ * @param call api call to wrap
+ * @returns api call bound to the current instance and profile
+ */
+export function useApi<C extends unknown[], R>(
+    call: (...args: [string, ...C, string]) => Promise<ApiResult<R>>,
+): (
+    ...args: C
+) => Promise<ApiResult<R>> {
+    const profile = useProfile();
+    return useCallback(
+        (...args: [...C]) => call(profile.instance, ...args, profile.token),
+        [profile, call],
+    );
+}
 
 function parseResponse<T>(
     response: ApiResponse<T>,

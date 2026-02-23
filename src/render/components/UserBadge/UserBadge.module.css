@@ -1,1 +1,11 @@
+.badge {
+    display: flex;
+    height: 5em;
+    justify-content: center;
+    align-items: center;
+}
 
+.badge img {
+    height: 100%;
+    border-radius: 100%;
+}

@@ -1,4 +1,4 @@
-import { ApiCall, buildApiCall } from '@/api';
+import { buildApiCall, EndpointCall } from '@/api';
 import { PrivateUser } from '@/schemas/api';
 import route from 'meta:api(./src/api)';
 
@@ -7,4 +7,4 @@ export const getMe = buildApiCall({
     method: 'GET',
     chaptchaRequired(response) {
     },
-}) satisfies ApiCall<never, PrivateUser>;
+}) satisfies EndpointCall<never, PrivateUser>;

@@ -1,11 +1,15 @@
+import { useProfile } from '@/render/store/Profile';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
+import { useContext } from 'preact/hooks';
 
 export type Instance = {
     api: {
         baseUrl: string;
-        apiVersions: string;
-        active: string[];
+        apiVersions: {
+            default: string;
+            active: string[];
+        };
     };
     cdn: {
         baseUrl: string;
@@ -53,6 +57,20 @@ InstanceStore.subscribe(() => {
 
 export const useInstances = () => {
     return useSelector(InstanceStore, (state) => state.context.instances) ?? [];
+};
+
+export const useInstance = () => {
+    const profile = useProfile();
+    const instance = useSelector(
+        InstanceStore,
+        (state) =>
+            state.context.instances?.find((i) => i.api.baseUrl == profile.instance),
+    );
+    if (!instance) {
+        throw new Error('Could not get instance');
+    }
+
+    return instance;
 };
 
 // export const useTokenMap = () => {

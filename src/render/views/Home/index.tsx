@@ -1,11 +1,11 @@
 import style from './Home.module.css';
 import { h } from 'preact';
-import { memo } from 'preact/compat';
+import { memo, useState } from 'preact/compat';
 import { Guildbar } from '@/render/components/Guildbar';
 import { createRouter, RouteTable, useView, View } from '@/lib/Router';
 import { Guild } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
-import { InstanceContext } from '@/render/hooks/useInstance';
+import { Profile, ProfileContext } from '@/render/store/Profile';
 
 export namespace Home {
     export type Props = {};
@@ -14,6 +14,7 @@ export namespace Home {
 export const GuildRouter = createRouter<RouteTable<string, View<Guild.Props>>>(
     {
         DM: () => <div>DM</div>,
+        '': () => <div>error</div>,
     },
     JSON.parse(localStorage.getItem('guild-router') ?? '""') || 'DM',
     Guild,
@@ -21,7 +22,7 @@ export const GuildRouter = createRouter<RouteTable<string, View<Guild.Props>>>(
 
 GuildRouter.subscribe(() => {
     const route = GuildRouter.getSnapshot().context.route;
-    localStorage.setItem('guild-router', JSON.stringify(route));
+    // localStorage.setItem('guild-router', JSON.stringify(route));
 });
 
 const _Home = ({}: Home.Props) => {
@@ -30,10 +31,8 @@ const _Home = ({}: Home.Props) => {
     const View = useView(GuildRouter);
 
     return <div class={style.home}>
-        <InstanceContext.Provider value='foo'>
-            <Guildbar></Guildbar>
-            <View></View>
-        </InstanceContext.Provider>
+        <Guildbar></Guildbar>
+        <View></View>
     </div>;
 };
 

@@ -1,23 +1,30 @@
+import style from './Login.module.css';
+
 import { Fragment, h } from 'preact';
-import { memo, useMemo, useState } from 'preact/compat';
+import { memo, useEffect, useMemo, useState } from 'preact/compat';
 
 import { LoginForm } from '@/render/views/Login/LoginForm';
-import { createRouter, Route, useRouter, useView } from '@/lib/Router';
+import { createRouter, useView } from '@/lib/Router';
 import { RegisterForm } from '@/render/views/Login/RegisterForm';
-import { ApiCall } from '@/api';
+import { useApi } from '@/api';
 import { FormController } from '@/render/views/Login/FormController';
 import { register } from '@/api/auth/register';
 import { login } from '@/api/auth/login';
-import { AppRouter } from '@/render/components/App';
-import { usePromise } from '@/lib/hooks';
 import { getMe } from '@/api/users/@me';
-import { LoadingScreen } from '@/render/components/LoadingScreen';
-import { Lumber } from '@/lib/log/Lumber';
-import { ProfileStore, useProfiles } from '@/render/store/Profile';
-import { createModal, Modal, useModal } from '@/lib/components/Modal';
-import { PrivateUser } from '@/schemas/api';
+import {
+    Profile,
+    ProfileContext,
+    ProfileStore,
+    useProfile,
+    useProfiles,
+} from '@/render/store/Profile';
+import { useModal } from '@/lib/components/Modal';
 import { LoginResponse, LoginSchema, RegisterSchema } from '@/schemas/uncategorised';
-import { TokenOnlyResponse, TokenResponse } from '@/schemas/index';
+import { TokenOnlyResponse } from '@/schemas/index';
+import { UserBadge } from '@/render/components/UserBadge';
+import { MoonLoader } from 'react-spinners';
+import { usePromise } from '@/lib/hooks/useAsync';
+import { IoCheckmark, IoClose } from 'react-icons/io5';
 
 namespace Login {
     export type Props = {};
@@ -38,7 +45,7 @@ const onSuccess = async (instance: string, { token }: { token: string | null }) 
     ProfileStore.trigger.addProfile({
         instance,
         token,
-        profile,
+        user: profile,
     });
 
     // AppRouter.trigger.setRoute({ route: 'home' });
@@ -74,7 +81,7 @@ export const LoginRouter = createRouter({
 }, 'login');
 
 export const Login = memo(({}: Login.Props) => {
-    const profiles = useProfilesAsArray();
+    const profiles = useProfiles();
 
     if (profiles.length > 0) {
         return <ProfileLoader profiles={profiles}></ProfileLoader>;
@@ -91,18 +98,67 @@ const FormView = memo(
 );
 
 const ProfileLoader = memo(
-    (props: { profiles: (readonly [string, string, PrivateUser])[] }) => {
-        return props.profiles.map((p, i) => <Profile key={i} profile={p}></Profile>);
+    (props: { profiles: Profile[] }) => {
+        const AddProfileModal = useModal(() => <FormView></FormView>);
+        const [successCount, setCount] = useState(0);
+
+        return <>
+            {props.profiles.map((p, i) =>
+                <ProfileContext.Provider value={p}>
+                    <Profile
+                        accept={() => setCount((c) => c + 1)}
+                        reject={() => []}
+                        key={i}
+                    >
+                    </Profile>
+                </ProfileContext.Provider>
+            )}
+            <button
+                onClick={() => AddProfileModal.open({})}
+            >
+                Add Profile
+            </button>
+            <button
+                disabled={successCount < props.profiles.length}
+            >
+                Continue
+            </button>
+        </>;
     },
 );
 
+namespace Profile {
+    export type Props = {
+        accept: () => void;
+        reject: () => void;
+    };
+}
+
 const Profile = memo(
-    (props: { profile: readonly [string, string, PrivateUser] }) => {
-        const [instance, token, profile] = props.profile;
+    ({ accept, reject }: Profile.Props) => {
+        const profile = useProfile();
+        const getMeHookThingy = useApi(getMe);
+        const validate = usePromise(getMeHookThingy);
 
-        console.log({ token });
+        const status = validate.resolved ?
+            validate.value.isOk() ? <IoCheckmark></IoCheckmark> : <IoClose></IoClose> :
+            <MoonLoader color='var(--clr-primary-a0)'></MoonLoader>;
 
-        return <div>{profile.username}</div>;
+        useEffect(() => {
+            if (!validate.resolved) {
+                return;
+            }
+            if (validate.value.isOk()) {
+                accept();
+            } else {
+                reject();
+            }
+        }, [validate.resolved, accept, reject]);
+
+        return <div class={style.profile}>
+            <UserBadge user={profile.user}></UserBadge>
+            {status}
+        </div>;
     },
 );
 

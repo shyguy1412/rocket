@@ -20,9 +20,7 @@ let current_try = 0;
 
 const sockets: Record<string, GatewaySocket> = {};
 
-export const getGatewaySocket = (instance: string) => {
-    const url = '';
-    throw new Error('get gateway url by instance');
+export const getGatewaySocket = (url: string, token: string) => {
     if (url in sockets) {
         return sockets[url];
     }
@@ -66,8 +64,6 @@ export const getGatewaySocket = (instance: string) => {
                 );
             }
         });
-
-        const token = ProfileStore.get().context.tokens[instance] ?? '';
 
         //authenticate socket connection
         socket.send(JSON.stringify({

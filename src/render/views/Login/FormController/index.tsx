@@ -1,16 +1,21 @@
 import style, { form } from './FormController.module.css';
 import { h, TargetedSubmitEvent } from 'preact';
 import { memo } from 'preact/compat';
-import { ApiCall, ApiResult } from '@/api';
+import { ApiResult, EndpointCall } from '@/api';
 import { Lumber } from '@/lib/log/Lumber';
 import { createModal, useModal } from '@/lib/components/Modal';
-import { Instance, InstanceStore, useInstances } from '@/render/store/Instance';
+import {
+    Instance,
+    InstanceContext,
+    InstanceStore,
+    useInstances,
+} from '@/render/store/Instance';
 
 export namespace FormController {
     export type Form = (props: FormProps) => h.JSX.Element;
 
     export type Props<B, R> = {
-        apiCall: ApiCall<B, R>;
+        apiCall: EndpointCall<B, R>;
         Form: Form;
         onSuccess: (instance: string, response: R) => void;
     };
@@ -26,13 +31,46 @@ const _AddInstanceModal = createModal(({ abort }) => {
         e.preventDefault();
         const url = e.currentTarget.querySelector('input')!.value.replace(/\/?$/, '/');
         fetch(`${url}.well-known/spacebar/client`)
-            .then((r) => r.json() as Promise<Instance>)
+            .then((r) => r.json() as Promise<any>)
             .catch(() => null)
-            .then((instance) => {
+            .then(async (instance) => {
                 if (!instance) {
                     throw new Error('not an instance');
                 }
-                InstanceStore.trigger.addInstance({ instance });
+
+                if (typeof instance.api == 'string') {
+                    let data = await fetch(instance.api + '/policies/instance/domains')
+                        .then((r) => r.json());
+
+                    let apiBaseURL = new URL(data.api);
+                    apiBaseURL.pathname = '';
+
+                    InstanceStore.trigger.addInstance({
+                        instance: {
+                            api: {
+                                baseUrl: apiBaseURL.toString().replace(/\/$/, ''),
+                                apiVersions: {
+                                    default: data.defaultApiVersion,
+                                    active: [data.defaultApiVersion],
+                                },
+                            },
+                            cdn: {
+                                baseUrl: data.cdn,
+                            },
+                            gateway: {
+                                baseUrl: data.gateway,
+                                encoding: [],
+                                compression: [],
+                            },
+                            admin: {
+                                baseUrl: data.admin,
+                            },
+                        },
+                    });
+                } else {
+                    InstanceStore.trigger.addInstance({ instance });
+                }
+
                 abort();
             });
     };

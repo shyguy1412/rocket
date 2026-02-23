@@ -3,8 +3,10 @@ import { memo } from 'preact/compat';
 
 import { Lumber } from '@/lib/log/Lumber';
 import { ChannelList } from '@/render/components/ChannelList';
-import { createRouter, RouteTable, useView, View } from '@/lib/Router';
+import { createRouter, RouteTable, useRoute, useView, View } from '@/lib/Router';
 import { Channel } from '@/render/views/Channel';
+import { Profile, ProfileContext, useProfile, useProfiles } from '@/render/store/Profile';
+import { GuildRouter } from '@/render/views/Home';
 
 export namespace Guild {
     export type Props = {};
@@ -26,9 +28,12 @@ const _Guild = ({}: Guild.Props) => {
 
     const Channel = useView(ChannelRouter);
 
-    return <>
-        <ChannelList></ChannelList>
+    const [token, guildID] = useRoute(GuildRouter).at(-1)!.split('::');
+    const profile = useProfiles().find((p) => p.token == token)!;
+
+    return <ProfileContext.Provider value={profile}>
+        <ChannelList guildID={guildID}></ChannelList>
         <Channel></Channel>
-    </>;
+    </ProfileContext.Provider>;
 };
 export const Guild = memo(_Guild);

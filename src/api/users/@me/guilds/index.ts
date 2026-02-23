@@ -1,4 +1,4 @@
-import { ApiCall, buildApiCall } from '@/api';
+import { buildApiCall, EndpointCall } from '@/api';
 import { APIGuildArray } from '@/schemas/responses';
 import route from 'meta:api(./src/api)';
 
@@ -7,4 +7,4 @@ export const getGuilds = buildApiCall({
     method: 'GET',
     chaptchaRequired(response) {
     },
-}) satisfies ApiCall<never, APIGuildArray>;
+}) satisfies EndpointCall<never, APIGuildArray>;

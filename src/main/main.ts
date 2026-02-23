@@ -74,20 +74,20 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 
-app.whenReady().then(() => {
-    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-        callback({
-            responseHeaders: {
-                ...details.responseHeaders,
-                'Content-Security-Policy': [
-                    `default-src 'self'; connect-src ${
-                        process.env.DEV ? 'http: ws:' : 'https: wss:'
-                    };script-src 'self'  ${process.env.DEV ? "'unsafe-inline'" : ''}`,
-                ],
-            },
-        });
-    });
-});
+// app.whenReady().then(() => {
+//     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+//         callback({
+//             responseHeaders: {
+//                 ...details.responseHeaders,
+//                 'Content-Security-Policy': [
+//                     `default-src 'self'; connect-src ${
+//                         process.env.DEV ? 'http: ws:' : 'https: wss:'
+//                     };script-src 'self'  ${process.env.DEV ? "'unsafe-inline'" : ''}`,
+//                 ],
+//             },
+//         });
+//     });
+// });
 
 app.whenReady().then(async () => {
     Menu.setApplicationMenu(createMenu());

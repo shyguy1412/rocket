@@ -1,4 +1,4 @@
-import { ApiCall, buildApiCall } from '@/api';
+import { buildApiCall, EndpointCall } from '@/api';
 import { PreloadMessagesResponseSchema } from '@/schemas/responses';
 import { PreloadMessagesRequestSchema } from '@/schemas/uncategorised';
 import route from 'meta:api(./src/api)';
@@ -8,4 +8,4 @@ export const preloadMessages = buildApiCall({
     method: 'POST',
     chaptchaRequired(response) {
     },
-}) satisfies ApiCall<PreloadMessagesRequestSchema, PreloadMessagesResponseSchema>;
+}) satisfies EndpointCall<PreloadMessagesRequestSchema, PreloadMessagesResponseSchema>;

@@ -13,7 +13,7 @@ namespace App {
 export const AppRouter = createRouter({
     login: Login,
     home: Home,
-}, 'login');
+}, 'home');
 
 export const App = memo(({}: App.Props) => {
     const View = useView(AppRouter);
