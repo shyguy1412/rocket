@@ -1,6 +1,6 @@
 .home {
     display: grid;
-    grid-template-columns: 10em 15em 1fr;
+    grid-template-columns: 10em 15em calc(100% - 10em - 15em);
     grid-template-rows: 100%;
     height: 100%;
 }

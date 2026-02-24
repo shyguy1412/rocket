@@ -6,6 +6,8 @@
 }
 
 .channellist ul {
+    list-style: none;
+
     overflow-y: auto;
     overflow-x: hidden;
     height: 100%;

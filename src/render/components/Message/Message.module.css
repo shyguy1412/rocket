@@ -1,1 +1,12 @@
+.message {
+    list-style: none;
+    display: flex;
+    margin-top: 1em;
+    gap: 1em;
+}
 
+.message code {
+    display: block;
+    text-wrap-mode: wrap;
+    word-break: break-word;
+}

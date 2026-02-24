@@ -36,7 +36,9 @@ const _Channel = ({}: Channel.Props) => {
 
     return <div class={style.channel}>
         {channelName}
-        <ul ref={(r) => r?.scrollTo(0, r.scrollHeight)}>
+        <ul
+            // ref={(r) => r?.scrollTo(0, r.scrollHeight)}
+        >
             {messages.map((m, i) => <Message key={i} message={m} />)}
         </ul>
         <form onSubmit={onSubmit}>
