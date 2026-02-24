@@ -18,7 +18,7 @@ export namespace Channel {
 
 const _Channel = ({}: Channel.Props) => {
     const [channelID] = useRoute(ChannelRouter);
-    const channelName = useChannel(channelID);
+    const channelName = useChannel(channelID)?.channel.name;
     const messages = useMessages(channelID);
 
     const sendChannelMessage = useApi(sendMessage).bind(undefined, channelID);

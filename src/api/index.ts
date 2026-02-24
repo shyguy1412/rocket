@@ -99,8 +99,6 @@ export function buildApiCall<
 
         const url = `${instance}/api/v9${route}?${queryParams}`;
 
-        console.log(url, body);
-
         return genericApiCall<B, R>(url, endpoint.method, body, token).then((r) => {
             if (r.isOk()) {
                 return r;

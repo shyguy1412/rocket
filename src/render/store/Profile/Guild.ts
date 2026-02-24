@@ -97,7 +97,7 @@ export const useChannel = (channelID: string) => {
                     prev ?? guild.channels.find((c) => c.channel.id == channelID),
                 undefined as undefined | Channel,
             ),
-        [guilds],
+        [guilds, channelID],
     );
 
     return channel;

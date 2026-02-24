@@ -10,6 +10,7 @@
 
 .channel form {
     display: flex;
+    margin-top: auto;
 }
 
 .channel form input[type='text'] {

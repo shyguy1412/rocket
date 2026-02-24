@@ -14,6 +14,7 @@ export function useMessages(channelID: string) {
     const token = useProfile().token;
 
     useEffect(() => {
+        setMessages([]);
         getChannelMessages(channelID)
             .then((response) => response.unwrap())
             .then((messages) => setMessages(messages.toReversed()))
