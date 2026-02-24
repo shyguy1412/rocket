@@ -40,7 +40,7 @@ const onSuccess = async (instance: string, { token }: { token: string | null }) 
         throw new Error('Not yet implemented');
     }
 
-    const profile = (await getMe(instance, undefined, token)).unwrap();
+    const profile = (await getMe(instance, token)).unwrap();
 
     ProfileStore.trigger.addProfile({
         instance,

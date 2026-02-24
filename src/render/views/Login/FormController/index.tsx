@@ -1,21 +1,16 @@
-import style, { form } from './FormController.module.css';
+import style from './FormController.module.css';
 import { h, TargetedSubmitEvent } from 'preact';
 import { memo } from 'preact/compat';
-import { ApiResult, EndpointCall } from '@/api';
+import { ApiCall, ApiResult } from '@/api';
 import { Lumber } from '@/lib/log/Lumber';
 import { createModal, useModal } from '@/lib/components/Modal';
-import {
-    Instance,
-    InstanceContext,
-    InstanceStore,
-    useInstances,
-} from '@/render/store/Instance';
+import { InstanceStore, useInstances } from '@/render/store/Instance';
 
 export namespace FormController {
     export type Form = (props: FormProps) => h.JSX.Element;
 
     export type Props<B, R> = {
-        apiCall: EndpointCall<B, R>;
+        apiCall: ApiCall<[], undefined, B, R>;
         Form: Form;
         onSuccess: (instance: string, response: R) => void;
     };
@@ -98,10 +93,11 @@ const _FormController = <B, R>(props: FormController.Props<B, R>) => {
             formData,
         ) as any;
 
-        const instance = requestBody['form_controller_instance'];
+        const instance = requestBody['form_controller_instance'] as string;
         delete requestBody['form_controller_instance'];
 
-        apiCall(instance, requestBody)
+        //@ts-ignore ts fails to properly resolve the variadic
+        apiCall(instance, requestBody as B)
             .then((result) => validateForm(form, result))
             .then((result) => result.map((response) => onSuccess(instance, response)));
     };

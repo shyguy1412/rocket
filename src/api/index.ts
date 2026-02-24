@@ -1,20 +1,70 @@
-import { Lumber } from '@/lib/log/Lumber';
 import { Result } from '@/lib/types/Result';
-import { useInstance } from '@/render/store/Instance';
 import { useProfile } from '@/render/store/Profile';
+
 import {
     APIErrorOrCaptchaResponse,
     APIErrorResponse,
     CaptchaRequiredResponse,
 } from '@/schemas/responses';
+
 import { useCallback } from 'preact/hooks';
 
 export type ApiResult<T> = Result<T, APIError>;
+export type APIError = {
+    code: number;
+    message: string;
+    errors: {
+        property: string;
+        code: string;
+        message: string;
+    }[];
+    body?: CaptchaRequiredResponse;
+};
+
 export type ApiResponse<R, E = APIErrorOrCaptchaResponse> = {
     headers: Headers;
     status: number;
     body: R | E;
 };
+
+type ApiCallParameters<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+> = [
+    instance: string,
+    // ...ApiCallData<P, Q, B>,
+    ...(P extends [] ? [] : P),
+    ...(Q extends undefined ? [] : [query: Q]),
+    ...(B extends undefined ? [] : [body: B]),
+    token?: string,
+];
+
+type ApiCallData<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+> = [
+    ...(P extends [] ? [] : P),
+    ...(Q extends undefined ? [] : [query: Q]),
+    ...(B extends undefined ? [] : [body: B]),
+];
+
+export type ApiCall<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+    R,
+> = (
+    ...args: ApiCallParameters<P, Q, B>
+) => Promise<ApiResult<R>>;
+
+export type HookedApiCall<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+    R,
+> = (...args: ApiCallData<P, Q, B>) => Promise<ApiResult<R>>;
 
 export type Endpoint = {
     route: string;
@@ -22,25 +72,57 @@ export type Endpoint = {
     chaptchaRequired?: (response: CaptchaRequiredResponse) => unknown;
 };
 
-export type EndpointCall<B, R = unknown> = (
-    endpoint: string,
-    body?: B,
-    token?: string,
-) => Promise<ApiResult<R>>;
+export function buildApiCall<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+    R,
+>(endpoint: Endpoint): ApiCall<P, Q, B, R> {
+    return (...args) => {
+        const instance = args.shift() as string;
 
-const API_ERROR_LOG_CHANNEL = 'API_ERROR_LOG_CHANNEL';
-Lumber.createChannel(API_ERROR_LOG_CHANNEL, 3);
-const logApiError = Lumber.getLogger(API_ERROR_LOG_CHANNEL);
+        const route = endpoint.route.replaceAll(
+            /(#[A-Za-z0-9_]*)/g,
+            () => args.shift() as string,
+        );
 
-export const buildApiCall = <B, R>(endpoint: Endpoint) =>
-async (
-    instance: string,
+        const token = typeof args.at(-1) == 'string' ? args.pop() as string : '';
+
+        let [query = {}, body] = args.slice() as [Q, B];
+
+        if (endpoint.method != 'GET' && body == undefined) {
+            body = query as B;
+            query = {};
+        }
+
+        const queryParams = Object.entries(query).reduce(
+            (prev, [p, v]) => prev + `${p}=${encodeURI(v)}`,
+            '',
+        );
+
+        const url = `${instance}/api/v9${route}?${queryParams}`;
+
+        console.log(url, body);
+
+        return genericApiCall<B, R>(url, endpoint.method, body, token).then((r) => {
+            if (r.isOk()) {
+                return r;
+            }
+            if (r.error.code != 0) {
+                return r;
+            }
+            endpoint.chaptchaRequired?.(r.error.body!);
+            return r;
+        });
+    };
+}
+const genericApiCall = async <B, R>(
+    url: string,
+    method: string,
     body?: B,
     token?: string,
 ): Promise<ApiResult<R>> => {
-    const { route, method, chaptchaRequired } = endpoint;
-
-    const request = fetch(`${instance}/api/v9${route}`, {
+    const request = fetch(url, {
         method,
         headers: {
             Authorization: token ?? '',
@@ -56,68 +138,49 @@ async (
     const result = await Result.fromPromise(request);
 
     return result
-        .andThen((response) => {
-            const intermediate = parseResponse<R>(
-                response,
-                chaptchaRequired,
-            );
-            return intermediate;
-        })
-        .mapErr((err) => parseError(err));
+        .andThen(parseResponse<R>)
+        .mapErr(parseError);
 };
-
-export type ApiCall<P extends string[], B, R> = (
-    ...args: [string, P, B, string]
-) => Promise<ApiResult<R>>;
 
 /**
  * Wraps an API call with the credentials provided by the current context
  * @param call api call to wrap
  * @returns api call bound to the current instance and profile
  */
-export function useApi<C extends unknown[], R>(
-    call: (...args: [string, ...C, string]) => Promise<ApiResult<R>>,
-): (
-    ...args: C
-) => Promise<ApiResult<R>> {
+export function useApi<
+    P extends string[],
+    Q extends Record<string, string> | undefined,
+    B,
+    R,
+>(call: ApiCall<P, Q, B, R>): HookedApiCall<P, Q, B, R> {
     const profile = useProfile();
     return useCallback(
-        (...args: [...C]) => call(profile.instance, ...args, profile.token),
+        (...args: ApiCallData<P, Q, B>) => call(profile.instance, ...args, profile.token),
         [profile, call],
     );
 }
 
-function parseResponse<T>(
-    response: ApiResponse<T>,
-    captchaCallback: Endpoint['chaptchaRequired'],
-): ApiResult<T> {
+function parseResponse<T>(response: ApiResponse<T>): ApiResult<T> {
     if (isCaptchaRequiredResponse(response)) {
-        captchaCallback?.(response.body);
         return Result.Err({
             code: 0,
             message: 'Captcha Required',
             errors: [],
+            body: response.body,
         });
     }
 
     if (isErrorResponse(response)) {
-        logApiError(response.body);
+        // const API_ERROR_LOG_CHANNEL = 'API_ERROR_LOG_CHANNEL';
+        // Lumber.createChannel(API_ERROR_LOG_CHANNEL, 3);
+        // logApiError(response.body);
+        // console.error(response.body);
         return Result.Err(formatAPIErrorResponse(response.body));
     }
 
     // TS seems to struggle with discrimination. Get more racist ffs
     return Result.Ok(response.body as T);
 }
-
-export type APIError = {
-    code: number;
-    message: string;
-    errors: {
-        property: string;
-        code: string;
-        message: string;
-    }[];
-};
 
 function formatAPIErrorResponse(err: APIErrorResponse): APIError {
     return {

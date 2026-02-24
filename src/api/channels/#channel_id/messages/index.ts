@@ -1,28 +1,24 @@
-import { buildApiCall, EndpointCall } from '@/api';
+import { buildApiCall } from '@/api';
 import { APIMessageArray } from '@/schemas/responses';
 import { MessageCreateSchema } from '@/schemas/uncategorised';
 import route from 'meta:api(./src/api)';
 
-export const getMessages = (server: string, channel_id: string, token: string) =>
-    (buildApiCall({
-        route: route.replace('#channel_id', channel_id),
-        method: 'GET',
-        chaptchaRequired(response) {
-        },
-    }) satisfies EndpointCall<never, APIMessageArray>)(server, undefined, token);
+export const getMessages = buildApiCall<
+    [channel_id: string],
+    undefined,
+    undefined,
+    APIMessageArray
+>({
+    route,
+    method: 'GET',
+});
 
-export const sendMessage = (
-    server: string,
-    channel_id: string,
-    body: MessageCreateSchema,
-    token: string,
-) => (buildApiCall({
-    route: route.replace('#channel_id', channel_id),
+export const sendMessage = buildApiCall<
+    [channel_id: string],
+    undefined,
+    MessageCreateSchema,
+    APIMessageArray[number]
+>({
+    route,
     method: 'POST',
-    chaptchaRequired(response) {
-    },
-}) satisfies EndpointCall<MessageCreateSchema, APIMessageArray[number]>)(
-    server,
-    body,
-    token,
-);
+});

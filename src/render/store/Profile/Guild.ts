@@ -87,7 +87,7 @@ export const useGuilds = () => {
         if (guilds != empty) {
             return;
         }
-        getProfileGuilds(undefined).then((result) =>
+        getProfileGuilds().then((result) =>
             result
                 .map((guilds) => guilds.map((guild) => ({ guild, channels: [] })))
                 .map((guilds) => GuildStore.trigger.addGuilds({ instance, guilds }))
