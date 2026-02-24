@@ -33,10 +33,7 @@ type ApiCallParameters<
     B,
 > = [
     instance: string,
-    // ...ApiCallData<P, Q, B>,
-    ...(P extends [] ? [] : P),
-    ...(Q extends undefined ? [] : [query: Q]),
-    ...(B extends undefined ? [] : [body: B]),
+    ...ApiCallData<P, Q, B>,
     token?: string,
 ];
 
