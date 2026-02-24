@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { app, BrowserWindow, Menu, MenuItem, protocol, session } from 'electron';
+import { app, BrowserWindow, Menu, MenuItem, protocol, session, shell } from 'electron';
 
 //TEMP
 const i18n = {
@@ -66,6 +66,11 @@ function createWindow() {
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
+
+    mainWindow.webContents.setWindowOpenHandler((details) => {
+        shell.openExternal(details.url);
+        return { action: 'deny' };
+    });
 
     return mainWindow;
 }
