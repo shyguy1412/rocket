@@ -1,10 +1,12 @@
 import style from './FormController.module.css';
-import { h, TargetedSubmitEvent } from 'preact';
-import { memo } from 'preact/compat';
-import { ApiCall, ApiResult } from '@/api';
+
+import { h, TargetedEvent, TargetedSubmitEvent } from 'preact';
+import { memo, useCallback } from 'preact/compat';
+
 import { Lumber } from '@/lib/log/Lumber';
+import { ApiCall, ApiResult } from '@/api';
 import { createModal, useModal } from '@/lib/components/Modal';
-import { InstanceStore, useInstances } from '@/render/store/Instance';
+import { Instance, InstanceStore, useInstances } from '@/render/store/Instance';
 
 export namespace FormController {
     export type Form = (props: FormProps) => h.JSX.Element;
@@ -15,59 +17,63 @@ export namespace FormController {
         onSuccess: (instance: string, response: R) => void;
     };
 
-    export type FormProps = {
-        // setRoute: (route: string) => void;
-        // onSubmit: (e: TargetedSubmitEvent<HTMLFormElement>) => void;
+    export type FormProps = {};
+}
+
+async function parseInstanceWellKnown(instance: any): Promise<Instance> {
+    if (!instance) {
+        throw new Error('not an instance');
+    }
+    if (typeof instance.api != 'string') {
+        return instance;
+    }
+
+    const data = await fetch(instance.api + '/policies/instance/domains')
+        .then((r) => r.json());
+
+    const apiBaseURL = new URL(data.api);
+    apiBaseURL.pathname = '';
+
+    const instanceFromV1 = {
+        api: {
+            baseUrl: apiBaseURL.toString().replace(/\/$/, ''),
+            apiVersions: {
+                default: data.defaultApiVersion,
+                active: [data.defaultApiVersion],
+            },
+        },
+        cdn: {
+            baseUrl: data.cdn,
+        },
+        gateway: {
+            baseUrl: data.gateway,
+            encoding: [],
+            compression: [],
+        },
+        admin: {
+            baseUrl: data.admin,
+        },
     };
+
+    return instanceFromV1;
+}
+
+function getInstance(url: string) {
+    return fetch(`${url}.well-known/spacebar/client`)
+        .then((r) => r.json() as Promise<any>)
+        .catch(() => null)
+        .then(parseInstanceWellKnown);
 }
 
 const _AddInstanceModal = createModal(({ abort }) => {
     const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const url = e.currentTarget.querySelector('input')!.value.replace(/\/?$/, '/');
-        fetch(`${url}.well-known/spacebar/client`)
-            .then((r) => r.json() as Promise<any>)
-            .catch(() => null)
-            .then(async (instance) => {
-                if (!instance) {
-                    throw new Error('not an instance');
-                }
-
-                if (typeof instance.api == 'string') {
-                    let data = await fetch(instance.api + '/policies/instance/domains')
-                        .then((r) => r.json());
-
-                    let apiBaseURL = new URL(data.api);
-                    apiBaseURL.pathname = '';
-
-                    InstanceStore.trigger.addInstance({
-                        instance: {
-                            api: {
-                                baseUrl: apiBaseURL.toString().replace(/\/$/, ''),
-                                apiVersions: {
-                                    default: data.defaultApiVersion,
-                                    active: [data.defaultApiVersion],
-                                },
-                            },
-                            cdn: {
-                                baseUrl: data.cdn,
-                            },
-                            gateway: {
-                                baseUrl: data.gateway,
-                                encoding: [],
-                                compression: [],
-                            },
-                            admin: {
-                                baseUrl: data.admin,
-                            },
-                        },
-                    });
-                } else {
-                    InstanceStore.trigger.addInstance({ instance });
-                }
-
-                abort();
-            });
+        getInstance(url)
+            .then((instance) => {
+                InstanceStore.trigger.addInstance({ instance });
+            })
+            .then(abort);
     };
 
     return <form onSubmit={onSubmit}>
@@ -102,38 +108,37 @@ const _FormController = <B, R>(props: FormController.Props<B, R>) => {
             .then((result) => result.map((response) => onSuccess(instance, response)));
     };
 
+    const Instances = useCallback(
+        () =>
+            instances.map((instance, i) =>
+                <option key={i} value={instance.api.baseUrl}>
+                    {instance.api.baseUrl}
+                </option>
+            ),
+        [instances],
+    );
+
+    const onInstanceChange = useCallback((e: TargetedEvent<HTMLSelectElement>) => {
+        if (e.currentTarget.value != 'add_new') {
+            return;
+        }
+        e.currentTarget.value = '';
+        AddInstanceModal.open({});
+    }, []);
+
     return <form class={style.form} onSubmit={onSubmit}>
         <label for='form_controller_instance'>Instance</label>
         <select
             name='form_controller_instance'
-            value={instances[0]?.api.baseUrl ?? ''}
-            onChange={(e) => {
-                if (e.currentTarget.value != 'new') {
-                    return;
-                }
-                e.currentTarget.value = '';
-                AddInstanceModal.open({});
-            }}
+            defaultValue={instances[0]?.api.baseUrl ?? ''}
+            onChange={onInstanceChange}
         >
-            {instances.map((instance, i) =>
-                <option key={i} value={instance.api.baseUrl}>
-                    {instance.api.baseUrl}
-                </option>
-            )}
-            <option
-                onClick={() => console.log('add')}
-                value={'new'}
-            >
+            <Instances></Instances>
+            <option value={'add_new'}>
                 Add Instance
             </option>
         </select>
-        {
-            /* <input
-            type='text'
-            name='form_controller_instance'
-            defaultValue='https://rory.server.spacebar.chat/api/v9'
-        /> */
-        }
+
         <Form></Form>
     </form>;
 };
@@ -148,17 +153,27 @@ function validateForm<R>(
         return result;
     }
 
-    for (const { property, message } of result.error.errors) {
+    for (const { property, message, code } of result.error.errors) {
         if (!property) {
             continue;
         }
 
+        //! handle validity for INVALID_LOGIN
+        //! validity for both login and password need to be reset if
+        //! either is changed
+        // //if the login is wrong both
+        // if (property != 'password' && code == "INVALID_LOGIN") {
+        //     continue;
+        // }
+
         const field = form.querySelector(
             `[name=${property}]`,
         );
+
         if (!field || !(field instanceof HTMLInputElement)) {
             continue;
         }
+
         field.setCustomValidity(message);
         field.addEventListener('change', () => field.setCustomValidity(''), {
             once: true,

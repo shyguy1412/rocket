@@ -3,9 +3,9 @@ import style from './Guildbar.module.css';
 import { h } from 'preact';
 import { memo } from 'preact/compat';
 
+import { Lumber } from '@/lib/log/Lumber';
 import { useRouter } from '@/lib/Router';
 import { GuildRouter } from '@/render/views/Home';
-import { Lumber } from '@/lib/log/Lumber';
 import { Profile, ProfileContext, useProfile, useProfiles } from '@/render/store/Profile';
 import { Guild, useGuilds } from '@/render/store/Profile/Guild';
 
@@ -29,9 +29,7 @@ const _Guildbar = ({}: Guildbar.Props) => {
 export const Guildbar = memo(_Guildbar);
 
 namespace ProfileGuilds {
-    export type Props = {
-        // profile: Profile;
-    };
+    export type Props = {};
 }
 
 const createGuildUID = (profile: Profile, guild: Guild) =>
@@ -43,8 +41,6 @@ const _ProfileGuilds = ({}: ProfileGuilds.Props) => {
     const profile = useProfile();
 
     Lumber.log(Lumber.RENDER, 'ProfileGuilds RENDER');
-
-    console.log(guilds);
 
     return <ul class={''}>
         {guilds.map((guild, key) =>

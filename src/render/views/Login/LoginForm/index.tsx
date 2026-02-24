@@ -1,5 +1,6 @@
 import { Fragment, h } from 'preact';
 import { memo } from 'preact/compat';
+
 import { FormController } from '@/render/views/Login/FormController';
 import { Lumber } from '@/lib/log/Lumber';
 import { LoginRouter } from '@/render/views/Login';

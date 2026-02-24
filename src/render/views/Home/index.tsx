@@ -1,11 +1,12 @@
 import style from './Home.module.css';
+
 import { h } from 'preact';
-import { memo, useState } from 'preact/compat';
+import { memo } from 'preact/compat';
+
 import { Guildbar } from '@/render/components/Guildbar';
 import { createRouter, RouteTable, useView, View } from '@/lib/Router';
 import { Guild } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
-import { Profile, ProfileContext } from '@/render/store/Profile';
 
 export namespace Home {
     export type Props = {};
@@ -22,7 +23,7 @@ export const GuildRouter = createRouter<RouteTable<string, View<Guild.Props>>>(
 
 GuildRouter.subscribe(() => {
     const route = GuildRouter.getSnapshot().context.route;
-    // localStorage.setItem('guild-router', JSON.stringify(route));
+    localStorage.setItem('guild-router', JSON.stringify(route));
 });
 
 const _Home = ({}: Home.Props) => {

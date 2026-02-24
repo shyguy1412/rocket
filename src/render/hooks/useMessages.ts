@@ -4,7 +4,7 @@ import { getGatewaySocket } from '@/render/lib/socket';
 import { useInstance } from '@/render/store/Instance';
 import { useProfile } from '@/render/store/Profile';
 import { APIMessageArray } from '@/schemas/responses';
-import { useCallback, useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 
 export function useMessages(channelID: string) {
     const [messages, setMessages] = useState([] as APIMessageArray);

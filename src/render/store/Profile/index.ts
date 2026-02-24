@@ -1,4 +1,3 @@
-import { useConstant } from '@/lib/hooks';
 import { PrivateUser } from '@/schemas/api';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
@@ -40,7 +39,3 @@ export const useProfiles = () => {
 };
 
 export const useProfile = () => useContext(ProfileContext);
-
-// export const useTokenMap = () => {
-//     return useSelector(ProfileStore, (state) => state.context.tokens);
-// };

@@ -1,11 +1,11 @@
-import { Fragment, h } from 'preact';
+import { h } from 'preact';
 import { memo } from 'preact/compat';
 
 import { Lumber } from '@/lib/log/Lumber';
 import { ChannelList } from '@/render/components/ChannelList';
 import { createRouter, RouteTable, useRoute, useView, View } from '@/lib/Router';
 import { Channel } from '@/render/views/Channel';
-import { Profile, ProfileContext, useProfile, useProfiles } from '@/render/store/Profile';
+import { ProfileContext, useProfiles } from '@/render/store/Profile';
 import { GuildRouter } from '@/render/views/Home';
 
 export namespace Guild {

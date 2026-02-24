@@ -1,7 +1,7 @@
 import style from './Login.module.css';
 
 import { Fragment, h } from 'preact';
-import { memo, useEffect, useMemo, useState } from 'preact/compat';
+import { memo, useCallback, useEffect, useState } from 'preact/compat';
 
 import { LoginForm } from '@/render/views/Login/LoginForm';
 import { createRouter, useView } from '@/lib/Router';
@@ -29,11 +29,6 @@ import { IoCheckmark, IoClose } from 'react-icons/io5';
 namespace Login {
     export type Props = {};
 }
-
-const API_SERVER = [
-    'https://rory.server.spacebar.chat/api/v9',
-    'https://api.yaoi.chat/api/v9',
-];
 
 const onSuccess = async (instance: string, { token }: { token: string | null }) => {
     if (token == null) {
@@ -102,17 +97,23 @@ const ProfileLoader = memo(
         const AddProfileModal = useModal(() => <FormView></FormView>);
         const [successCount, setCount] = useState(0);
 
+        const Profiles = useCallback(
+            () =>
+                props.profiles.map((p, i) =>
+                    <ProfileContext.Provider value={p}>
+                        <Profile
+                            accept={() => setCount((c) => c + 1)}
+                            reject={() => []}
+                            key={i}
+                        >
+                        </Profile>
+                    </ProfileContext.Provider>
+                ),
+            [props.profiles, setCount],
+        );
+
         return <>
-            {props.profiles.map((p, i) =>
-                <ProfileContext.Provider value={p}>
-                    <Profile
-                        accept={() => setCount((c) => c + 1)}
-                        reject={() => []}
-                        key={i}
-                    >
-                    </Profile>
-                </ProfileContext.Provider>
-            )}
+            <Profiles></Profiles>
             <button
                 onClick={() => AddProfileModal.open({})}
             >
@@ -161,51 +162,3 @@ const Profile = memo(
         </div>;
     },
 );
-
-// const token = useToken(instance);
-
-// const LoginRouter = useMemo(() =>
-//     createRouter({
-//         login: () =>
-//             <FormController
-//                 setRoute={(route: string) =>
-//                     LoginRouter.trigger.setRoute({
-//                         route: route as any, //idgaf
-//                     })}
-//                 apiCall={login}
-//                 Form={LoginForm}
-//                 onSuccess={onSuccess}
-//             />,
-//         register: () =>
-//             <FormController
-//                 setRoute={(route: string) =>
-//                     LoginRouter.trigger.setRoute({
-//                         route: route as any, //idgaf
-//                     })}
-//                 apiCall={login}
-//                 Form={RegisterForm}
-//                 onSuccess={onSuccess}
-//             />,
-//     }, 'login'), []);
-
-// const tryLogin = usePromise(
-//     useMemo(() => getMe.bind(undefined, instance), [instance]),
-// );
-
-// const View = useView(LoginRouter);
-
-// Lumber.log(Lumber.RENDER, 'LOGIN RENDER');
-
-// const notLoggedIn = ((localStorage.getItem('token') ?? '') == '') ||
-//     (tryLogin.resolved && tryLogin.value.isError());
-
-// if (notLoggedIn) {
-//     return <View />;
-// }
-
-// if (tryLogin.resolved && tryLogin.value.isOk()) {
-//     SettingsStore.trigger.set(tryLogin.value.value);
-//     setRoute('home');
-// }
-
-// return <LoadingScreen />;

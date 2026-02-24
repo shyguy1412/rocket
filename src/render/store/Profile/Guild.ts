@@ -1,19 +1,11 @@
-import { ApiCall, useApi } from '@/api';
+import { useApi } from '@/api';
 import { getChannels } from '@/api/guilds/#guild_id/channels';
 import { getGuilds } from '@/api/users/@me/guilds';
-import { useConstant } from '@/lib/hooks';
 import { useInstance } from '@/render/store/Instance';
-import { PrivateUser } from '@/schemas/api';
-import {
-    APIChannelArray,
-    APIGuild,
-    APIGuildArray,
-    APIMessageArray,
-} from '@/schemas/index';
+import { APIChannelArray, APIGuild, APIMessageArray } from '@/schemas/index';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
-import { createContext } from 'preact';
-import { useContext, useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useMemo } from 'preact/hooks';
 
 type GuildStoreContext = {
     guilds: {

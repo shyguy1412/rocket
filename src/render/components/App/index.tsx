@@ -1,10 +1,12 @@
-import { createRouter, useRouter, useView } from '@/lib/Router';
 import style from './App.module.css';
+
 import { h } from 'preact';
 import { memo } from 'preact/compat';
+
 import { Login } from '@/render/views/Login';
 import { Home } from '@/render/views/Home';
 import { Lumber } from '@/lib/log/Lumber';
+import { createRouter, useView } from '@/lib/Router';
 
 namespace App {
     export type Props = {};

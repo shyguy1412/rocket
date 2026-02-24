@@ -4,8 +4,7 @@ import { h } from 'preact';
 import { memo } from 'preact/compat';
 
 import { Lumber } from '@/lib/log/Lumber';
-import { useRoute, useRouter } from '@/lib/Router';
-import { GuildRouter } from '@/render/views/Home';
+import { useRouter } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
 import { useChannels, useGuilds } from '@/render/store/Profile/Guild';
 

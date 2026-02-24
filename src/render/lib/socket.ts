@@ -1,5 +1,3 @@
-import { ProfileStore } from '@/render/store/Profile';
-
 export type GatewayEvent = 'MESSAGE_CREATE' | 'MESSAGE_UPDATE';
 
 type CustomEventHandler = (ev: CustomEvent) => void;

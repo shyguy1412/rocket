@@ -17,6 +17,7 @@ import { useProfile } from '@/render/store/Profile';
 export namespace Channel {
     export type Props = {};
 }
+
 const _Channel = ({}: Channel.Props) => {
     const channelID = useRoute(ChannelRouter).at(-1)!;
     const guildID = useRoute(GuildRouter).at(-1)!;
@@ -40,14 +41,10 @@ const _Channel = ({}: Channel.Props) => {
 
     return <div class={style.channel}>
         {channelName}
-        <ul
-            ref={(r) => r?.scrollTo(0, r.scrollHeight)}
-        >
+        <ul ref={(r) => r?.scrollTo(0, r.scrollHeight)}>
             {messages.map((m, i) => <Message key={i} message={m} />)}
         </ul>
-        <form
-            onSubmit={onSubmit}
-        >
+        <form onSubmit={onSubmit}>
             <input type='text' />
             <input type='submit' hidden />
         </form>
