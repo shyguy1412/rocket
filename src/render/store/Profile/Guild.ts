@@ -73,8 +73,6 @@ export const useGuilds = () => {
         (state) => state.context.guilds?.[instance],
     ) ?? empty;
 
-    console.log(guilds);
-
     useEffect(() => {
         if (guilds != empty) {
             return;
@@ -87,6 +85,22 @@ export const useGuilds = () => {
     }, [guilds, instance]);
 
     return guilds;
+};
+
+export const useChannel = (channelID: string) => {
+    const guilds = useGuilds();
+
+    const channel = useMemo(
+        () =>
+            guilds.reduce(
+                (prev, guild) =>
+                    prev ?? guild.channels.find((c) => c.channel.id == channelID),
+                undefined as undefined | Channel,
+            ),
+        [guilds],
+    );
+
+    return channel;
 };
 
 export const useChannels = (guildID: string) => {

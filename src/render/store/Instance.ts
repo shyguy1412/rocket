@@ -1,7 +1,11 @@
 import { useProfile } from '@/render/store/Profile';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
-import { useContext } from 'preact/hooks';
+
+const API_SERVER = [
+    'https://rory.server.spacebar.chat/api/v9',
+    'https://api.yaoi.chat/api/v9',
+];
 
 export type Instance = {
     api: {

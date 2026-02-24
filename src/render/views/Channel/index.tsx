@@ -6,36 +6,31 @@ import { memo } from 'preact/compat';
 import { useRoute } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
-import { GuildRouter } from '@/render/views/Home';
 import { sendMessage } from '@/api/channels/#channel_id/messages';
 import { Message } from '@/render/components/Message';
 import { useMessages } from '@/render/hooks/useMessages';
-import { useInstance } from '@/render/store/Instance';
-import { useChannels } from '@/render/store/Profile/Guild';
-import { useProfile } from '@/render/store/Profile';
+import { useChannel } from '@/render/store/Profile/Guild';
+import { useApi } from '@/api';
 
 export namespace Channel {
     export type Props = {};
 }
 
 const _Channel = ({}: Channel.Props) => {
-    const channelID = useRoute(ChannelRouter).at(-1)!;
-    const guildID = useRoute(GuildRouter).at(-1)!;
-    const channelName = useChannels(guildID).find((c) => c.channel.id == channelID)
-        ?.channel.name;
+    const [channelID] = useRoute(ChannelRouter);
+    const channelName = useChannel(channelID);
     const messages = useMessages(channelID);
-    const instance = useInstance().api.baseUrl;
-    const token = useProfile().token;
+
+    const sendChannelMessage = useApi(sendMessage).bind(undefined, channelID);
 
     Lumber.log(Lumber.RENDER, 'CHANNEL RENDER');
 
     const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const input = e.currentTarget.querySelector('input')!;
-        sendMessage(instance, channelID, {
+        sendChannelMessage({
             content: input.value,
-        }, token);
-
+        });
         input.value = '';
     };
 
