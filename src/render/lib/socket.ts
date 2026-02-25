@@ -1,3 +1,6 @@
+import { useInstance } from '@/render/store/Instance';
+import { useProfile } from '@/render/store/Profile';
+
 export type GatewayEvent = 'MESSAGE_CREATE' | 'MESSAGE_UPDATE';
 
 type CustomEventHandler = (ev: CustomEvent) => void;
@@ -18,9 +21,19 @@ let current_try = 0;
 
 const sockets: Record<string, GatewaySocket> = {};
 
-export const getGatewaySocket = (url: string, token: string) => {
+export const useGateway = () => {
+    const token = useProfile().token;
+    const url = useInstance().gateway.baseUrl;
+    return getGatewaySocket(url, token);
+};
+
+export const getGatewaySocket = (url: string, token?: string) => {
     if (url in sockets) {
         return sockets[url];
+    }
+
+    if (!token) {
+        throw new Error('not yet connected');
     }
 
     let socket: WebSocket;
