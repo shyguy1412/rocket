@@ -1,4 +1,5 @@
 import { useProfile } from '@/render/store/Profile';
+import { APIGeneralConfiguration } from '@/schemas/index';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
 
@@ -26,6 +27,7 @@ export type Instance = {
     admin: {
         baseUrl: string;
     };
+    config: APIGeneralConfiguration;
 };
 
 type InstanceStoreContext = {

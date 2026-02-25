@@ -111,12 +111,13 @@ export function buildApiCall<
         });
     };
 }
-const genericApiCall = async <B, R>(
+
+async function genericApiCall<B, R>(
     url: string,
     method: string,
     body?: B,
     token?: string,
-): Promise<ApiResult<R>> => {
+): Promise<ApiResult<R>> {
     const request = fetch(url, {
         method,
         headers: {
@@ -135,7 +136,7 @@ const genericApiCall = async <B, R>(
     return result
         .andThen(parseResponse<R>)
         .mapErr(parseError);
-};
+}
 
 /**
  * Wraps an API call with the credentials provided by the current context
