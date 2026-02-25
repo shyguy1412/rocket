@@ -1,7 +1,7 @@
 import style from './Message.module.css';
 
-import { DetailedHTMLProps, h, HTMLAttributes } from 'preact';
-import { memo } from 'preact/compat';
+import { h, HTMLAttributes } from 'preact';
+import { memo, useMemo } from 'preact/compat';
 
 import { APIMessageArray } from '@/schemas/responses';
 import { Avatar } from '@/render/components/Avatar';
@@ -30,15 +30,13 @@ const InNewWindowAnchor = (props: HTMLAttributes<HTMLAnchorElement>) => {
 };
 
 const _Message = ({ message }: Message.Props) => {
-    const cdn = useInstance().cdn.baseUrl;
+    const cdn = useMemo(() => useInstance().cdn.baseUrl, [message]);
 
     const Images = message.attachments?.filter((att) =>
         att.content_type?.includes('image')
     ).map((att) => {
-        return <img src={att.url} />;
+        return <img loading='lazy' src={att.proxy_url} />;
     });
-
-    console.log(message);
 
     return <li class={style.message}>
         <Avatar user={message.author!} />
