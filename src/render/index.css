@@ -9,6 +9,8 @@ html, body {
     height: 100%;
 
     font-family: 'Exo 2 Variable';
+
+    background-color: var(--clr-surface-a0);
 }
 
 :root {

@@ -3,12 +3,13 @@
     overflow-y: clip;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .channellist ul {
     list-style: none;
+}
 
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
+.channellist > ul {
+    padding: 0;
 }

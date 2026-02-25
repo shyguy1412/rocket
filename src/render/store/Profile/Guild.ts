@@ -1,11 +1,12 @@
 import { useApi } from '@/api';
 import { getChannels } from '@/api/guilds/#guild_id/channels';
 import { getGuilds } from '@/api/users/@me/guilds';
+import { useGateway } from '@/render/lib/socket';
 import { useInstance } from '@/render/store/Instance';
 import { APIChannelArray, APIGuild, APIMessageArray } from '@/schemas/index';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
-import { useEffect, useMemo } from 'preact/hooks';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
 
 type GuildStoreContext = {
     guilds: {
@@ -20,7 +21,6 @@ export type Guild = {
 
 export type Channel = {
     channel: APIChannelArray[number];
-    messageCache: APIMessageArray;
 };
 
 type SetGuildChannelsAction = {
@@ -48,7 +48,6 @@ export const GuildStore = createStore({
                 return context;
             }
             guild.channels = action.channels.map((c) => ({
-                messageCache: [],
                 channel: c,
             }));
             return { guilds: context.guilds };
@@ -58,8 +57,6 @@ export const GuildStore = createStore({
 
 GuildStore.subscribe(() => {
     const ctx = GuildStore.getSnapshot().context;
-    console.log(ctx);
-
     localStorage.setItem('guild-store', JSON.stringify(ctx));
 });
 
@@ -103,10 +100,27 @@ export const useChannel = (channelID: string) => {
     return channel;
 };
 
+const CacheMap: Record<string, boolean> = {};
+
 export const useChannels = (guildID: string) => {
     const empty = useMemo(() => [], []);
     const instance = useInstance().api.baseUrl;
     const getProfileChannels = useApi(getChannels);
+    const gateway = useGateway();
+
+    const updateChannels = useCallback(
+        () =>
+            getProfileChannels(guildID).then((result) =>
+                result.map((channels) =>
+                    GuildStore.trigger.setGuildChannels({
+                        instance,
+                        guildID,
+                        channels,
+                    })
+                )
+            ),
+        [guildID],
+    );
 
     const channels = useSelector(
         GuildStore,
@@ -115,20 +129,17 @@ export const useChannels = (guildID: string) => {
     ) ?? empty;
 
     useEffect(() => {
-        if (channels.length > 0) {
+        if (guildID in CacheMap) {
             return;
         }
+        CacheMap[guildID] = true;
 
-        getProfileChannels(guildID).then((result) =>
-            result.map((channels) =>
-                GuildStore.trigger.setGuildChannels({
-                    instance,
-                    guildID,
-                    channels,
-                })
-            )
-        );
-    }, channels);
+        const controller = new AbortController();
+
+        updateChannels();
+
+        return controller.abort();
+    }, [guildID, ...channels, gateway, updateChannels]);
 
     return channels;
 };

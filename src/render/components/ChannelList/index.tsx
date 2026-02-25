@@ -44,7 +44,11 @@ const _ChannelList = ({ guildID }: ChannelList.Props) => {
 
     return <div class={style.channellist}>
         {guildName}
-        {categories.map((c, i) => <ChannelGroup key={i} group={c} />)}
+        {categories.map((c, i) =>
+            c.length > 1 ? <ChannelGroup key={i} group={c} /> : <ul>
+                <Channel key={i} channel={c[0]}></Channel>
+            </ul>
+        )}
     </div>;
 };
 
@@ -61,15 +65,21 @@ const _ChannelGroup = (props: ChannelGroup.Props) => {
     return <details open>
         <summary>{category.channel.name}</summary>
         <ul>
-            {channels.map((c, i) =>
-                <li
-                    key={i}
-                    onClick={useCallback(navigateToChannel.bind(undefined, c), [c])}
-                >
-                    {c.channel.name}
-                </li>
-            )}
+            {channels.map((c, i) => <Channel key={i} channel={c}></Channel>)}
         </ul>
     </details>;
 };
 const ChannelGroup = memo(_ChannelGroup);
+namespace Channel {
+    export type Props = {
+        channel: Channel;
+    };
+}
+
+const _Channel = ({ channel }: Channel.Props) =>
+    <li
+        onClick={useCallback(navigateToChannel.bind(undefined, channel), [channel])}
+    >
+        {channel.channel.name}
+    </li>;
+const Channel = memo(_Channel);

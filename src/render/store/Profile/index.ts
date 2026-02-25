@@ -1,5 +1,7 @@
+import { initializeProfile } from '@/render/lib/init';
 import { getGatewaySocket } from '@/render/lib/socket';
 import { InstanceStore } from '@/render/store/Instance';
+import { MessageStore } from '@/render/store/Profile/Message';
 import { PrivateUser } from '@/schemas/api';
 import { createStore } from '@xstate/store';
 import { useSelector } from '@xstate/store-react';
@@ -33,22 +35,11 @@ ProfileStore.subscribe((state) => {
     localStorage.setItem('profile-store', JSON.stringify(state.context));
 });
 
-const openGateways = (profiles: Profile[]) => {
-    for (const profile of profiles ?? []) {
-        const gatewayUrl = InstanceStore.get().context.instances?.find((i) =>
-            i.api.baseUrl == profile.instance
-        );
-        if (!gatewayUrl) {
-            continue;
-        }
-        const socket = getGatewaySocket(gatewayUrl.gateway.baseUrl, profile.token);
-        //add service to do things
-    }
-};
 ProfileStore.subscribe((state) => {
-    openGateways(state.context.profiles ?? []);
+    //! handle this more nicely
+    window.location.reload();
+    // openGateways(state.context.profiles ?? []);
 });
-openGateways(ProfileStore.get().context.profiles ?? []);
 
 export const useProfiles = () => {
     const empty = useMemo(() => [], []);
@@ -56,4 +47,8 @@ export const useProfiles = () => {
     return state;
 };
 
-export const useProfile = () => useContext(ProfileContext);
+export const useProfile = () => {
+    const profile = useContext(ProfileContext);
+    initializeProfile(profile);
+    return profile;
+};

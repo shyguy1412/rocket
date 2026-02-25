@@ -8,7 +8,7 @@ import { ChannelRouter } from '@/render/views/Guild';
 import { Lumber } from '@/lib/log/Lumber';
 import { sendMessage } from '@/api/channels/#channel_id/messages';
 import { Message } from '@/render/components/Message';
-import { useMessages } from '@/render/hooks/useMessages';
+import { useMessages } from '@/render/store/Profile/Message';
 import { useChannel } from '@/render/store/Profile/Guild';
 import { useApi } from '@/api';
 

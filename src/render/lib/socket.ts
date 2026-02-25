@@ -14,6 +14,7 @@ type GatewaySocket = {
     addEventListener: addCustomEventListener;
     dispatchEvent: EventTarget['dispatchEvent'];
     removeEventListener: EventTarget['removeEventListener'];
+    send: (data: unknown) => void;
 };
 
 const RETRY_COUNT = 3;
@@ -58,6 +59,7 @@ export const getGatewaySocket = (url: string, token?: string) => {
         ) as addCustomEventListener,
         dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
         removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+        send: (data: unknown) => socket.send(JSON.stringify(data)),
     };
 
     reconnect();

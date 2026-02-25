@@ -11,11 +11,15 @@
     word-break: break-word;
 }
 
+.message > div > img {
+    max-width: 15em;
+}
+
 .content img {
     width: 1.2em;
     height: 1.2em;
 }
 
-.message > div > img {
-    max-width: 15em;
+.content > * {
+    margin: 0;
 }
