@@ -11,7 +11,6 @@ export function useMessages(channelID: string) {
 
     const getChannelMessages = useApi(getMessages);
     const gateway = useInstance().gateway.baseUrl;
-    const token = useProfile().token;
 
     useEffect(() => {
         setMessages([]);
@@ -23,7 +22,7 @@ export function useMessages(channelID: string) {
 
     useEffect(() => {
         const controller = new AbortController();
-        const GatewaySocket = getGatewaySocket(gateway, token);
+        const GatewaySocket = getGatewaySocket(gateway);
 
         GatewaySocket.addEventListener('MESSAGE_CREATE', (ev) => {
             if (ev.detail.channel_id != channelID) {
@@ -35,7 +34,7 @@ export function useMessages(channelID: string) {
         }, { signal: controller.signal });
 
         return () => controller.abort();
-    }, [channelID, gateway, token]);
+    }, [channelID, gateway]);
 
     return messages;
 }
