@@ -41,7 +41,21 @@ const _Channel = ({}: Channel.Props) => {
         }
         const ul = ulRef.current;
         ul.scrollTo(0, ul.scrollHeight);
-    }, [ulRef.current, channelID, messages == undefined]);
+
+        const graceArea = 10;
+        let height = ul.scrollHeight - ul.clientHeight;
+
+        const observer = new MutationObserver(() => {
+            if (ul.scrollTop >= height - graceArea) {
+                ul.scrollTo(0, ul.scrollHeight);
+                height = ul.scrollHeight - ul.clientHeight;
+            }
+        });
+
+        observer.observe(ul, { childList: true });
+
+        return () => observer.disconnect();
+    }, [ulRef, channelID, messages == undefined]);
 
     return <div class={style.channel}>
         {channelName}
