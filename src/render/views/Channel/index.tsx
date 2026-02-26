@@ -1,7 +1,7 @@
 import style from './Channel.module.css';
 
 import { h, TargetedSubmitEvent } from 'preact';
-import { memo } from 'preact/compat';
+import { memo, useEffect, useRef } from 'preact/compat';
 
 import { useRoute } from '@/lib/Router';
 import { ChannelRouter } from '@/render/views/Guild';
@@ -17,13 +17,14 @@ export namespace Channel {
 }
 
 const _Channel = ({}: Channel.Props) => {
+    Lumber.log(Lumber.RENDER, 'CHANNEL RENDER');
+
     const [channelID] = useRoute(ChannelRouter);
     const channelName = useChannel(channelID)?.channel.name;
     const messages = useMessages(channelID);
+    const ulRef = useRef<HTMLUListElement>(null);
 
     const sendChannelMessage = useApi(sendMessage).bind(undefined, channelID);
-
-    Lumber.log(Lumber.RENDER, 'CHANNEL RENDER');
 
     const onSubmit = (e: TargetedSubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -34,12 +35,20 @@ const _Channel = ({}: Channel.Props) => {
         input.value = '';
     };
 
+    useEffect(() => {
+        if (!ulRef.current) {
+            return;
+        }
+        const ul = ulRef.current;
+        ul.scrollTo(0, ul.scrollHeight);
+    }, [ulRef.current, channelID, messages == undefined]);
+
     return <div class={style.channel}>
         {channelName}
         <ul
-            ref={(r) => r?.scrollTo(0, r.scrollHeight)}
+            ref={ulRef}
         >
-            {messages.map((m, i) => <Message key={i} message={m} />)}
+            {messages?.map((m, i) => <Message key={i} message={m} />)}
         </ul>
         <form onSubmit={onSubmit}>
             <input type='text' />

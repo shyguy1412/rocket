@@ -5,14 +5,27 @@
     gap: 1em;
 }
 
-.message code {
-    display: block;
+.message * {
     text-wrap-mode: wrap;
     word-break: break-word;
 }
 
+.message code {
+    display: block;
+}
+
 .message > div > img {
-    max-width: 15em;
+    display: inline-block;
+
+    --real-height: attr(data-height px);
+    --real-width: attr(data-width px);
+    --aspect-ratio: calc(var(--real-height) / var(--real-width));
+
+    --target-width: min(var(--real-width), 15em);
+    --target-height: calc(var(--target-width) * var(--aspect-ratio));
+
+    height: var(--target-height);
+    width: var(--target-width);
 }
 
 .content img {

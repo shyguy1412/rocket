@@ -35,7 +35,12 @@ const _Message = ({ message }: Message.Props) => {
     const Images = message.attachments?.filter((att) =>
         att.content_type?.includes('image')
     ).map((att) => {
-        return <img loading='lazy' src={att.proxy_url} />;
+        return <img
+            data-height={att.height}
+            data-width={att.width}
+            loading='lazy'
+            src={att.proxy_url}
+        />;
     });
 
     return <li class={style.message}>

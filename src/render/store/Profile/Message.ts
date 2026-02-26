@@ -33,8 +33,6 @@ export const MessageStore = createStore({
                 messages: ctx[ev.instance]![channelID].messages,
             };
 
-            console.log('FOO');
-
             return { ...ctx };
         },
     },
@@ -52,8 +50,6 @@ export function useMessages(channelID: string) {
     const apiUrl = instance.api.baseUrl;
     const getChannelMessages = useApi(getMessages);
     const gateway = useGateway();
-
-    console.log(apiUrl);
 
     const messages = useSelector(MessageStore, (state) => {
         return state.context[apiUrl]?.[channelID];
@@ -93,36 +89,5 @@ export function useMessages(channelID: string) {
         return () => controller.abort();
     }, [apiUrl, channelID]);
 
-    console.log(messages);
-
-    // const [messages, setMessages] = useState([] as APIMessageArray);
-
-    // const getChannelMessages = useApi(getMessages);
-    // const gateway = useInstance().gateway.baseUrl;
-
-    // useEffect(() => {
-    //     setMessages([]);
-    //     // getChannelMessages(channelID)
-    //     //     .then((response) => response.unwrap())
-    //     //     .then((messages) => setMessages(messages.toReversed()))
-    //     //     .catch((err) => console.error(err));
-    // }, [channelID]);
-
-    // useEffect(() => {
-    //     const controller = new AbortController();
-    //     const GatewaySocket = getGatewaySocket(gateway);
-
-    //     GatewaySocket.addEventListener('MESSAGE_CREATE', (ev) => {
-    //         if (ev.detail.channel_id != channelID) {
-    //             return;
-    //         }
-    //         setMessages((messages) => {
-    //             return [...messages, ev.detail];
-    //         });
-    //     }, { signal: controller.signal });
-
-    //     return () => controller.abort();
-    // }, [channelID, gateway]);
-
-    return messages;
+    return messages == empty ? undefined : messages;
 }
